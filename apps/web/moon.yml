@@ -1,0 +1,88 @@
+language: 'javascript'
+
+fileGroups:
+  tests:
+    - 'tests/**/*'
+    - '**/*.test.ts*'
+  source:
+    - 'src/**/*.{ts,js,tsx,jsx}'
+    - 'pages/**/*.{ts,js,tsx,jsx}'
+
+tasks:
+  start-optimized-build:
+    deps:
+      - '~:build'
+    command: next start
+
+  build:
+    deps:
+      - '~:relay-codegen'
+      - '~:graphql-codegen'
+    command: next build
+    inputs:
+      - '@group(source)'
+      - 'next.config.js'
+
+  cypress-gh:
+    command: synpress run --configFile cypress.config.ts
+
+  next-dev-server:
+    command: next dev
+    local: true
+
+  dev:
+    command: noop
+    local: true
+    deps:
+      - '~:next-dev-server'
+      - '~:relay-watch'
+      - '~:graphql-codegen-watch'
+
+  start:
+    command: next start
+    local: true
+
+  synpress-open:
+    command: synpress open --configFile cypress.config.ts
+    platform: node
+
+  synpress-run:
+    command: synpress run --configFile cypress.config.ts
+    local: true
+
+  relay-watch:
+    command: yarn relay-compiler --project web --repersist --watch ../../relay.config.js
+    local: true
+
+  graphql-codegen-watch:
+    command: graphql-codegen --watch
+    local: true
+
+  graphql-codegen:
+    command: graphql-codegen
+    inputs:
+      - '@group(source)'
+
+  relay-codegen:
+    command: yarn relay-compiler --project web --repersist ../../relay.config.js
+    inputs:
+      - '@group(source)'
+
+  nextjs-routes:
+    command: nextjs-routes
+
+  codegen:
+    deps:
+      - '~:nextjs-routes'
+      - '~:relay-codegen'
+      - '~:graphql-codegen'
+
+  # Inherited from root task
+  typecheck:
+    deps:
+      - '~:codegen'
+
+  test:
+    deps:
+      - '~:codegen'
+    command: jest

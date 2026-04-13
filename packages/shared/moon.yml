@@ -1,0 +1,29 @@
+fileGroups:
+  source:
+    - 'src/**/*.{ts,tsx}'
+
+tasks:
+  relay-watch:
+    command: relay-compiler --project shared --repersist --watch ../../relay.config.js
+    local: true
+
+  relay-codegen:
+    command: relay-compiler --project shared --repersist ../../relay.config.js
+    inputs:
+      - '@group(source)'
+
+  codegen-watch:
+    command: relay-compiler --project shared --repersist --watch ../../relay.config.js
+    local: true
+
+  # Inherited from root task
+  typecheck:
+    deps:
+      - '~:relay-codegen'
+
+  test:
+    command: jest
+
+  test-watch:
+    local: true
+    command: jest --watch

@@ -1,0 +1,2964 @@
+directive @defer(label: String, if: Boolean! = true) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"""
+Exposes a URL that specifies the behavior of this scalar.
+"""
+directive @specifiedBy(
+  """
+  The URL that specifies the behavior of this scalar.
+  """
+  url: String!
+) on SCALAR
+
+enum Action {
+  UserCreated
+  UserFollowedUsers
+  CollectorsNoteAddedtoToken
+  CollectionCreated
+  CollectorsNoteAddedToCollection
+  TokensAddedToCollection
+}
+
+scalar Address
+
+union AddRolesToUserPayloadOrError = GalleryUser | ErrNotAuthorized
+
+type AddUserWalletPayload {
+  viewer: Viewer
+}
+
+union AddUserWalletPayloadOrError =
+    AddUserWalletPayload
+  | ErrAuthenticationFailed
+  | ErrNotAuthorized
+  | ErrInvalidInput
+  | ErrAddressOwnedByUser
+
+input AdminAddWalletInput {
+  username: String!
+  chainAddress: ChainAddressInput!
+  walletType: WalletType!
+}
+
+type AdminAddWalletPayload {
+  user: GalleryUser
+}
+
+union AdminAddWalletPayloadOrError =
+    AdminAddWalletPayload
+  | ErrUserNotFound
+  | ErrAddressOwnedByUser
+  | ErrNotAuthorized
+
+type Admire implements Node {
+  id: ID!
+  dbid: DBID!
+  creationTime: Time
+  lastUpdated: Time
+  admirer: GalleryUser
+  source: AdmireSource
+}
+
+type AdmireCommentPayload {
+  viewer: Viewer
+  comment: Comment
+  admire: Admire
+}
+
+union AdmireCommentPayloadOrError =
+    AdmireCommentPayload
+  | ErrCommentNotFound
+  | ErrInvalidInput
+  | ErrNotAuthorized
+
+type AdmireFeedEventPayload {
+  viewer: Viewer
+  admire: Admire
+  feedEvent: FeedEvent
+}
+
+union AdmireFeedEventPayloadOrError =
+    AdmireFeedEventPayload
+  | ErrAuthenticationFailed
+  | ErrFeedEventNotFound
+  | ErrInvalidInput
+  | ErrAdmireAlreadyExists
+
+type AdmirePostPayload {
+  viewer: Viewer
+  post: Post
+  admire: Admire
+}
+
+union AdmirePostPayloadOrError =
+    AdmirePostPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+  | ErrPostNotFound
+
+union AdmireSource = Post | FeedEvent | Comment
+
+type AdmireTokenPayload {
+  viewer: Viewer
+  token: Token
+  admire: Admire
+}
+
+union AdmireTokenPayloadOrError =
+    AdmireTokenPayload
+  | ErrTokenNotFound
+  | ErrInvalidInput
+  | ErrNotAuthorized
+
+type ArtBlocksCommunity {
+  communityKey: ArtBlocksCommunityKey
+  contract: Contract
+  projectID: String
+}
+
+type ArtBlocksCommunityKey {
+  contract: ChainAddress
+  projectID: String
+}
+
+input ArtBlocksCommunityKeyInput {
+  contract: ChainAddressInput!
+  projectID: String!
+}
+
+type AudioMedia implements Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURL: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+input AuthMechanism {
+  eoa: EoaAuth
+  gnosisSafe: GnosisSafeAuth
+  debug: DebugAuth
+  magicLink: MagicLinkAuth
+  oneTimeLoginToken: OneTimeLoginTokenAuth
+  privy: PrivyAuth
+  neynar: NeynarAuth
+}
+
+type AuthNonce {
+  nonce: String
+  message: String
+}
+
+union AuthorizationError =
+    ErrNoCookie
+  | ErrInvalidToken
+  | ErrSessionInvalidated
+  | ErrDoesNotOwnRequiredToken
+
+type Badge {
+  name: String
+  imageURL: String!
+  contract: Contract
+}
+
+type BanUserFromFeedPayload {
+  user: GalleryUser
+}
+
+union BanUserFromFeedPayloadOrError = BanUserFromFeedPayload | ErrNotAuthorized
+
+enum BasicAuthType {
+  Retool
+  Monitoring
+}
+
+type BlockUserPayload {
+  userId: DBID!
+}
+
+union BlockUserPayloadOrError =
+    BlockUserPayload
+  | ErrUserNotFound
+  | ErrNotAuthorized
+  | ErrInvalidInput
+
+enum Chain {
+  Ethereum
+  Arbitrum
+  Polygon
+  Optimism
+  Tezos
+  POAP
+  Zora
+  Base
+}
+
+type ChainAddress {
+  address: Address
+  chain: Chain
+}
+
+input ChainAddressInput {
+  address: Address!
+  chain: Chain!
+}
+
+input ChainAddressTokenInput {
+  chainAddress: ChainAddressInput!
+
+  """
+  Refers to the id of the token in the contract either in decimal, or interpreted as hexadecimal when prefixed with '0x'
+  """
+  tokenId: TokenId!
+}
+
+type ChainPubKey {
+  pubKey: PubKey
+  chain: Chain
+}
+
+input ChainPubKeyInput {
+  pubKey: PubKey!
+  chain: Chain!
+}
+
+type ChainTokens {
+  chain: Chain
+  tokens: [Token]
+}
+
+type ClearAllNotificationsPayload {
+  notifications: [Notification]
+}
+
+type Collection implements Node {
+  id: ID!
+  dbid: DBID!
+  version: Int
+  name: String
+  collectorsNote: String
+  gallery: Gallery
+  layout: CollectionLayout
+  hidden: Boolean
+  tokens(limit: Int): [CollectionToken]
+}
+
+union CollectionByIdOrError = Collection | ErrCollectionNotFound | ErrInvalidInput
+
+type CollectionCreatedFeedEventData implements FeedEventData {
+  eventTime: Time
+  owner: GalleryUser
+  action: Action
+  collection: Collection
+  newTokens: [CollectionToken]
+  newCollectorsNote: String
+}
+
+type CollectionEdge {
+  node: Collection
+  cursor: String
+}
+
+type CollectionLayout {
+  sections: [Int]
+  sectionLayout: [CollectionSectionLayout]
+}
+
+input CollectionLayoutInput {
+  sections: [Int!]!
+  sectionLayout: [CollectionSectionLayoutInput!]!
+}
+
+type CollectionsConnection {
+  edges: [CollectionEdge]
+  pageInfo: PageInfo!
+}
+
+type CollectionSectionLayout {
+  columns: Int
+  whitespace: [Int]
+}
+
+input CollectionSectionLayoutInput {
+  columns: Int!
+  whitespace: [Int!]!
+}
+
+type CollectionToken implements Node {
+  id: ID!
+  token: Token
+  collection: Collection
+  tokenSettings: CollectionTokenSettings
+}
+
+union CollectionTokenByIdOrError = CollectionToken | ErrCollectionNotFound | ErrTokenNotFound
+
+type CollectionTokenSettings {
+  renderLive: Boolean
+  highDefinition: Boolean
+}
+
+input CollectionTokenSettingsInput {
+  tokenId: DBID!
+  renderLive: Boolean!
+  highDefinition: Boolean!
+}
+
+type CollectionUpdatedFeedEventData implements FeedEventData {
+  eventTime: Time
+  owner: GalleryUser
+  action: Action
+  collection: Collection
+  newCollectorsNote: String
+  newTokens: [CollectionToken]
+}
+
+type CollectorsNoteAddedToCollectionFeedEventData implements FeedEventData {
+  eventTime: Time
+  owner: GalleryUser
+  action: Action
+  collection: Collection
+  newCollectorsNote: String
+}
+
+type CollectorsNoteAddedToTokenFeedEventData implements FeedEventData {
+  eventTime: Time
+  owner: GalleryUser
+  action: Action
+  token: CollectionToken
+  newCollectorsNote: String
+}
+
+type Comment implements Node {
+  id: ID!
+  dbid: DBID!
+  creationTime: Time
+  lastUpdated: Time
+  replyTo: Comment
+  commenter: GalleryUser
+  comment: String
+  mentions: [Mention]
+  replies(before: String, after: String, first: Int, last: Int): CommentsConnection
+  source: CommentSource
+  deleted: Boolean
+  viewerAdmire: Admire
+  admires(before: String, after: String, first: Int, last: Int): CommentAdmiresConnection
+}
+
+type CommentAdmireEdge {
+  node: Admire
+  cursor: String
+}
+
+type CommentAdmiresConnection {
+  edges: [CommentAdmireEdge]
+  pageInfo: PageInfo
+}
+
+type CommentEdge {
+  node: Comment
+  cursor: String
+}
+
+type CommentOnFeedEventPayload {
+  viewer: Viewer
+  comment: Comment
+  replyToComment: Comment
+  feedEvent: FeedEvent
+}
+
+union CommentOnFeedEventPayloadOrError =
+    CommentOnFeedEventPayload
+  | ErrAuthenticationFailed
+  | ErrFeedEventNotFound
+  | ErrInvalidInput
+
+type CommentOnPostPayload {
+  viewer: Viewer
+  post: Post
+  comment: Comment
+  replyToComment: Comment
+}
+
+union CommentOnPostPayloadOrError = CommentOnPostPayload | ErrInvalidInput | ErrNotAuthorized
+
+type CommentsConnection {
+  edges: [CommentEdge]
+  pageInfo: PageInfo!
+}
+
+union CommentSource = Post | FeedEvent
+
+type CommunitiesConnection {
+  edges: [CommunityEdge]
+  pageInfo: PageInfo!
+}
+
+type Community implements Node {
+  dbid: DBID!
+  id: ID!
+  lastUpdated: Time
+  name: String
+  description: String
+  profileImageURL: String
+  badgeURL: String
+  mintURL: String
+  subtype: CommunitySubtype
+  creators: [GalleryUserOrAddress]
+  holders(before: String, after: String, first: Int, last: Int): TokenHoldersConnection
+  tokens(before: String, after: String, first: Int, last: Int): TokensConnection
+  posts(before: String, after: String, first: Int, last: Int): PostsConnection
+  tokensForFrame(limit: Int!): [Token]
+  contract: Contract
+    @deprecated(reason: "Use Community.subtype. Not all communities have contracts.")
+  contractAddress: ChainAddress
+    @deprecated(reason: "Use Community.subtype. Not all communities have contracts.")
+  chain: Chain @deprecated(reason: "Use Community.subtype. Not all communities have contracts.")
+  creatorAddress: ChainAddress @deprecated(reason: "Use Community.creators to get an address")
+  creator: GalleryUserOrAddress
+  tokensInCommunity(
+    before: String
+    after: String
+    first: Int
+    last: Int
+    onlyGalleryUsers: Boolean
+  ): TokensConnection @deprecated(reason: "Use Community.tokens")
+  owners(
+    before: String
+    after: String
+    first: Int
+    last: Int
+    onlyGalleryUsers: Boolean
+  ): TokenHoldersConnection @deprecated(reason: "Use Community.holders")
+  galleries(
+    maxPreviews: Int!
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): CommunityGalleriesConnection
+  viewerIsMember: Boolean
+}
+
+union CommunityByAddressOrError = Community | ErrCommunityNotFound | ErrInvalidInput
+
+union CommunityByIdOrError = Community | ErrCommunityNotFound | ErrInvalidInput
+
+union CommunityByKeyOrError = Community | ErrCommunityNotFound | ErrInvalidInput
+
+type CommunityEdge {
+  node: Community
+  cursor: String
+}
+
+type CommunityGalleriesConnection {
+  edges: [CommunityGalleryEdge]
+  pageInfo: PageInfo!
+}
+
+type CommunityGallery {
+  gallery: Gallery
+  tokenPreviews: [PreviewURLSet]
+}
+
+type CommunityGalleryEdge {
+  node: CommunityGallery
+  cursor: String
+}
+
+type CommunitySearchResult {
+  community: Community
+}
+
+union CommunitySubtype = ContractCommunity | ArtBlocksCommunity
+
+type ConnectSocialAccountPayload {
+  viewer: Viewer
+}
+
+union ConnectSocialAccountPayloadOrError =
+    ConnectSocialAccountPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+
+type Contract implements Node {
+  id: ID!
+  dbid: DBID!
+  lastUpdated: Time
+  contractAddress: ChainAddress
+  creatorAddress: ChainAddress
+  chain: Chain
+  name: String
+  profileImageURL: String
+  profileBannerURL: String
+  badgeURL: String
+  mintURL: String
+  isSpam: Boolean
+}
+
+type ContractCommunity {
+  communityKey: ContractCommunityKey
+  contract: Contract
+}
+
+type ContractCommunityKey {
+  contract: ChainAddress
+}
+
+input ContractCommunityKeyInput {
+  contract: ChainAddressInput!
+}
+
+input CreateCollectionInGalleryInput {
+  name: String!
+  collectorsNote: String!
+  tokens: [DBID!]!
+  layout: CollectionLayoutInput!
+  tokenSettings: [CollectionTokenSettingsInput!]!
+  hidden: Boolean!
+  givenID: DBID!
+}
+
+input CreateCollectionInput {
+  galleryId: DBID!
+  name: String!
+  collectorsNote: String!
+  tokens: [DBID!]!
+  layout: CollectionLayoutInput!
+  tokenSettings: [CollectionTokenSettingsInput!]!
+  caption: String
+}
+
+type CreateCollectionPayload {
+  collection: Collection
+  feedEvent: FeedEvent
+}
+
+union CreateCollectionPayloadOrError = CreateCollectionPayload | ErrNotAuthorized | ErrInvalidInput
+
+input CreatedCommunitiesInput {
+  includeChains: [Chain!]
+}
+
+input CreateGalleryInput {
+  name: String
+  description: String
+  position: String!
+}
+
+type CreateGalleryPayload {
+  gallery: Gallery
+}
+
+union CreateGalleryPayloadOrError = CreateGalleryPayload | ErrInvalidInput | ErrNotAuthorized
+
+input CreateUserInput {
+  username: String!
+  bio: String
+  email: Email
+  galleryName: String
+  galleryDescription: String
+  galleryPosition: String
+  importWallets: [ImportWalletSource!]
+}
+
+type CreateUserPayload {
+  userId: DBID
+  galleryId: DBID
+  viewer: Viewer
+}
+
+union CreateUserPayloadOrError =
+    CreateUserPayload
+  | ErrAuthenticationFailed
+  | ErrDoesNotOwnRequiredToken
+  | ErrUserAlreadyExists
+  | ErrUsernameNotAvailable
+  | ErrInvalidInput
+  | ErrEmailAlreadyUsed
+
+enum DarkMode {
+  Disabled
+  Enabled
+}
+
+scalar DBID
+
+input DebugAuth {
+  asUsername: String
+  userId: DBID
+  chainAddresses: [ChainAddressInput!]
+  debugToolsPassword: String
+}
+
+input DebugSocialAuth {
+  provider: SocialAccountType!
+  id: String!
+  username: String!
+  debugToolsPassword: String
+}
+
+type DeleteCollectionPayload {
+  gallery: Gallery
+}
+
+union DeleteCollectionPayloadOrError =
+    DeleteCollectionPayload
+  | ErrNotAuthorized
+  | ErrInvalidInput
+  | ErrCollectionNotFound
+
+type DeletedNode implements Node {
+  id: ID!
+  dbid: DBID!
+}
+
+type DeleteGalleryPayload {
+  deletedId: DeletedNode
+}
+
+union DeleteGalleryPayloadOrError = DeleteGalleryPayload | ErrInvalidInput | ErrNotAuthorized
+
+type DeletePostPayload {
+  deletedId: DeletedNode
+}
+
+union DeletePostPayloadOrError = DeletePostPayload | ErrInvalidInput | ErrNotAuthorized
+
+type DisconnectSocialAccountPayload {
+  viewer: Viewer
+}
+
+union DisconnectSocialAccountPayloadOrError =
+    DisconnectSocialAccountPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+  | ErrNeedsToReconnectSocial
+
+scalar Email
+
+type EmailNotificationSettings {
+  unsubscribedFromAll: Boolean!
+  unsubscribedFromNotifications: Boolean!
+  unsubscribedFromDigest: Boolean!
+  unsubscribedFromMarketing: Boolean
+  unsubscribedFromMembersClub: Boolean
+}
+
+enum EmailUnsubscriptionType {
+  All
+  Notifications
+  Digest
+  Marketing
+  MembersClub
+}
+
+enum EmailVerificationStatus {
+  Unverified
+  Verified
+  Failed
+  Admin
+}
+
+type EnsProfileImage {
+  wallet: Wallet
+  profileImage: HTTPSProfileImage
+  token: Token
+}
+
+input EoaAuth {
+  chainPubKey: ChainPubKeyInput!
+  nonce: String!
+  message: String!
+  signature: String!
+}
+
+type ErrAddressNotOwnedByUser implements Error {
+  message: String!
+}
+
+type ErrAddressOwnedByUser implements Error {
+  message: String!
+}
+
+type ErrAdmireAlreadyExists implements Error {
+  message: String!
+}
+
+type ErrAdmireNotFound implements Error {
+  message: String!
+}
+
+type ErrAuthenticationFailed implements Error {
+  message: String!
+}
+
+type ErrCollectionNotFound implements Error {
+  message: String!
+}
+
+type ErrCommentNotFound implements Error {
+  message: String!
+}
+
+type ErrCommunityNotFound implements Error {
+  message: String!
+}
+
+type ErrDoesNotOwnRequiredToken implements Error {
+  message: String!
+}
+
+type ErrEmailAlreadyUsed implements Error {
+  message: String!
+}
+
+type ErrEmailUnverified implements Error {
+  message: String!
+}
+
+type ErrFeedEventNotFound implements Error {
+  message: String!
+}
+
+type ErrGalleryNotFound implements Error {
+  message: String!
+}
+
+type ErrHighlightChainNotSupported implements Error {
+  message: String!
+}
+
+type ErrHighlightClaimAlreadyMinted implements Error {
+  message: String!
+}
+
+type ErrHighlightClaimInProgress implements Error {
+  message: String!
+}
+
+type ErrHighlightMintUnavailable implements Error {
+  message: String!
+}
+
+type ErrHighlightTxnFailed implements Error {
+  message: String!
+}
+
+type ErrHighlightClaimInProgress implements Error {
+  message: String!
+}
+
+type ErrHighlightClaimAlreadyMinted implements Error {
+  message: String!
+}
+
+type ErrInvalidInput implements Error {
+  message: String!
+  parameters: [String!]!
+  reasons: [String!]!
+}
+
+type ErrInvalidToken implements Error {
+  message: String!
+}
+
+type ErrNeedsToReconnectSocial implements Error {
+  socialAccountType: SocialAccountType!
+  message: String!
+}
+
+type ErrNoAvatarRecordSet implements Error {
+  message: String!
+}
+
+type ErrNoCookie implements Error {
+  message: String!
+}
+
+type ErrNotAuthorized implements Error {
+  message: String!
+  cause: AuthorizationError!
+}
+
+interface Error {
+  message: String!
+}
+
+type ErrPostNotFound implements Error {
+  message: String!
+}
+
+type ErrPushTokenBelongsToAnotherUser implements Error {
+  message: String!
+}
+
+type ErrSessionInvalidated implements Error {
+  message: String!
+}
+
+type ErrSyncFailed implements Error {
+  message: String!
+}
+
+type ErrTokenNotFound implements Error {
+  message: String!
+}
+
+type ErrUnknownAction implements Error {
+  message: String!
+}
+
+type ErrUserAlreadyExists implements Error {
+  message: String!
+}
+
+type ErrUsernameNotAvailable implements Error {
+  message: String!
+}
+
+type ErrUserNotFound implements Error {
+  message: String!
+}
+
+type FallbackMedia {
+  mediaURL: String
+  mediaType: String
+}
+
+input FarcasterAuth {
+  address: Address!
+
+  """
+  withSigner will make a request to authenticate the user with an on chain
+  transaction that can be approved on their warpcast app.
+  the `FarcasterSocialAccount` type will return an `approvalURL` that will link the user to make the on chain transaction.
+  """
+  withSigner: Boolean
+}
+
+type FarcasterSocialAccount implements SocialAccount {
+  type: SocialAccountType!
+  social_id: String!
+  name: String!
+  username: String!
+  profileImageURL: String!
+  bio: String!
+  display: Boolean!
+  approvalURL: String
+  signerStatus: String
+}
+
+type FeedConnection {
+  edges: [FeedEdge]
+  pageInfo: PageInfo!
+}
+
+type FeedEdge {
+  node: FeedEventOrError
+  cursor: String
+}
+
+type FeedEvent implements Node {
+  id: ID!
+  dbid: DBID!
+  eventData: FeedEventData
+  admires(before: String, after: String, first: Int, last: Int): FeedEventAdmiresConnection
+  comments(before: String, after: String, first: Int, last: Int): FeedEventCommentsConnection
+  totalComments: Int
+  caption: String
+  interactions(before: String, after: String, first: Int, last: Int): InteractionsConnection
+  viewerAdmire: Admire
+  hasViewerAdmiredEvent: Boolean
+}
+
+type FeedEventAdmireEdge {
+  node: Admire
+  cursor: String
+}
+
+type FeedEventAdmiresConnection {
+  edges: [FeedEventAdmireEdge]
+  pageInfo: PageInfo!
+}
+
+union FeedEventByIdOrError = FeedEvent | ErrFeedEventNotFound | ErrUnknownAction
+
+type FeedEventCommentEdge {
+  node: Comment
+  cursor: String
+}
+
+type FeedEventCommentsConnection {
+  edges: [FeedEventCommentEdge]
+  pageInfo: PageInfo!
+}
+
+interface FeedEventData {
+  eventTime: Time
+  owner: GalleryUser
+  action: Action
+}
+
+"""
+Can return posts as well
+"""
+union FeedEventOrError =
+    FeedEvent
+  | Post
+  | ErrPostNotFound
+  | ErrFeedEventNotFound
+  | ErrUnknownAction
+
+type FollowAllOnboardingRecommendationsPayload {
+  viewer: Viewer
+}
+
+union FollowAllOnboardingRecommendationsPayloadOrError =
+    FollowAllOnboardingRecommendationsPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+
+type FollowAllSocialConnectionsPayload {
+  viewer: Viewer
+}
+
+union FollowAllSocialConnectionsPayloadOrError =
+    FollowAllSocialConnectionsPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+  | ErrNeedsToReconnectSocial
+
+type FollowInfo {
+  user: GalleryUser
+  followedBack: Boolean
+}
+
+type FollowUserPayload {
+  viewer: Viewer
+  user: GalleryUser
+}
+
+union FollowUserPayloadOrError =
+    FollowUserPayload
+  | ErrAuthenticationFailed
+  | ErrUserNotFound
+  | ErrInvalidInput
+
+type Gallery implements Node {
+  id: ID!
+  dbid: DBID!
+  name: String
+  description: String
+  position: String
+  hidden: Boolean
+  tokenPreviews: [PreviewURLSet]
+  owner: GalleryUser
+  collections: [Collection]
+}
+
+type GalleryAnnouncementNotification implements Notification & Node {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  platform: Platform!
+  internalId: String!
+  imageUrl: String
+  title: String
+  description: String
+  ctaText: String
+  ctaLink: String
+  pushNotificationText: String
+}
+
+union GalleryByIdPayloadOrError = Gallery | ErrGalleryNotFound
+
+type GalleryInfoUpdatedFeedEventData implements FeedEventData {
+  eventTime: Time
+  owner: GalleryUser
+  newName: String
+  newDescription: String
+  action: Action
+}
+
+input GalleryPositionInput {
+  galleryId: DBID!
+  position: String!
+}
+
+type GallerySearchResult {
+  gallery: Gallery
+}
+
+type GalleryUpdatedFeedEventData implements FeedEventData {
+  eventTime: Time
+  owner: GalleryUser
+  action: Action
+  gallery: Gallery
+  subEventDatas: [FeedEventData!]
+  newName: String
+  newDescription: String
+}
+
+type GalleryUser implements Node {
+  id: ID!
+  dbid: DBID!
+  username: String
+  profileImage: ProfileImage
+  potentialEnsProfileImage: EnsProfileImage
+  bio: String
+  universal: Boolean
+  roles: [Role]
+  socialAccounts: SocialAccounts
+  tokens(ownershipFilter: [TokenOwnershipType!]): [Token]
+  tokensBookmarked(before: String, after: String, first: Int, last: Int): TokensConnection
+  wallets: [Wallet]
+  primaryWallet: Wallet
+  featuredGallery: Gallery
+  galleries: [Gallery]
+  badges: [Badge]
+  isAuthenticatedUser: Boolean
+  followers: [GalleryUser]
+  following: [GalleryUser]
+  feed(before: String, after: String, first: Int, last: Int): FeedConnection
+  sharedFollowers(before: String, after: String, first: Int, last: Int): UsersConnection
+  sharedCommunities(before: String, after: String, first: Int, last: Int): CommunitiesConnection
+  createdCommunities(
+    input: CreatedCommunitiesInput!
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): CommunitiesConnection
+  isMemberOfCommunity(communityID: DBID!): Boolean!
+}
+
+union GalleryUserOrAddress = GalleryUser | ChainAddress
+
+union GalleryUserOrWallet = GalleryUser | Wallet
+
+type GenerateQRCodeLoginTokenPayload {
+  token: String!
+}
+
+union GenerateQRCodeLoginTokenPayloadOrError = GenerateQRCodeLoginTokenPayload | ErrNotAuthorized
+
+union GetAuthNoncePayloadOrError = AuthNonce
+
+type GIFMedia implements Media {
+  previewURLs: PreviewURLSet
+  staticPreviewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURL: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+type GltfMedia implements Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURL: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+input GnosisSafeAuth {
+  address: Address!
+  nonce: String!
+  message: String!
+}
+
+interface GroupedNotification {
+  id: ID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  count: Int
+}
+
+type GroupNotificationUserEdge {
+  node: GalleryUser
+  cursor: String
+}
+
+type GroupNotificationUsersConnection {
+  edges: [GroupNotificationUserEdge]
+  pageInfo: PageInfo
+}
+
+input HighlightClaimMintInput {
+  collectionId: String!
+  recipientWalletId: DBID!
+}
+
+type HighlightClaimMintPayload {
+  claimId: DBID!
+}
+
+union HighlightClaimMintPayloadOrError =
+    HighlightClaimMintPayload
+  | ErrHighlightTxnFailed
+  | ErrHighlightMintUnavailable
+  | ErrHighlightChainNotSupported
+  | ErrAddressNotOwnedByUser
+  | ErrHighlightClaimInProgress
+  | ErrHighlightClaimAlreadyMinted
+  | ErrNotAuthorized
+
+type HighlightMintClaimStatusPayload {
+  status: HighlightTxStatus!
+  token: Token
+}
+
+union HighlightMintClaimStatusPayloadOrError =
+    HighlightMintClaimStatusPayload
+  | ErrHighlightTxnFailed
+  | ErrHighlightMintUnavailable
+  | ErrNotAuthorized
+
+enum HighlightTxStatus {
+  TX_PENDING
+  TX_COMPLETE
+  TOKEN_SYNCED
+}
+
+type HtmlMedia implements Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURL: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+type HTTPSProfileImage {
+  previewURLs: PreviewURLSet
+}
+
+type ImageMedia implements Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURL: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+enum ImportWalletSource {
+  Farcaster
+}
+
+union Interaction = Admire | Comment
+
+type InteractionsConnection {
+  edges: [InteractionsEdge]
+  pageInfo: PageInfo!
+}
+
+type InteractionsEdge {
+  node: Interaction
+  cursor: String
+}
+
+enum InteractionType {
+  Admire
+  Comment
+}
+
+type Interval {
+  start: Int!
+  length: Int!
+}
+
+input IntervalInput {
+  start: Int!
+  length: Int!
+}
+
+type InvalidMedia implements Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURL: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+type JsonMedia implements Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURL: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+input LensAuth {
+  address: Address!
+
+  """
+  signature is the signed challenge provided by a GQL request to the lens endpoint
+  """
+  signature: String
+}
+
+type LensSocialAccount implements SocialAccount {
+  type: SocialAccountType!
+  social_id: String!
+  name: String!
+  username: String!
+  profileImageURL: String!
+  bio: String!
+  display: Boolean!
+  signatureApproved: Boolean!
+}
+
+type LoginPayload {
+  userId: DBID
+  viewer: Viewer
+}
+
+union LoginPayloadOrError =
+    LoginPayload
+  | ErrUserNotFound
+  | ErrAuthenticationFailed
+  | ErrEmailUnverified
+  | ErrDoesNotOwnRequiredToken
+
+type LogoutPayload {
+  viewer: Viewer
+}
+
+input MagicLinkAuth {
+  token: String!
+}
+
+interface Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+type MediaDimensions {
+  width: Int
+  height: Int
+  aspectRatio: Float
+}
+
+union MediaSubtype =
+    ImageMedia
+  | GIFMedia
+  | VideoMedia
+  | AudioMedia
+  | TextMedia
+  | PdfMedia
+  | HtmlMedia
+  | JsonMedia
+  | GltfMedia
+  | UnknownMedia
+  | SyncingMedia
+  | InvalidMedia
+
+type MembershipTier implements Node {
+  id: ID!
+  dbid: DBID!
+  name: String
+  assetUrl: String
+  tokenId: String
+  owners: [TokenHolder]
+}
+
+type Mention {
+  entity: MentionEntity
+  interval: Interval
+}
+
+union MentionEntity = GalleryUser | Community
+
+input MentionInput {
+  interval: IntervalInput
+  userId: DBID
+  communityId: DBID
+}
+
+union MentionSource = Comment | Post
+
+type MerchDiscountCode {
+  code: String!
+  tokenId: String
+}
+
+type MerchToken implements Node {
+  id: ID!
+  tokenId: String!
+  objectType: MerchType!
+  discountCode: String
+  redeemed: Boolean!
+}
+
+type MerchTokensPayload {
+  tokens: [MerchToken!]
+}
+
+union MerchTokensPayloadOrError = MerchTokensPayload | ErrInvalidInput
+
+enum MerchType {
+  TShirt
+  Hat
+  Card
+}
+
+input MintPremiumCardToWalletInput {
+  tokenId: String!
+  walletAddresses: [Address!]
+}
+
+type MintPremiumCardToWalletPayload {
+  tx: String!
+}
+
+union MintPremiumCardToWalletPayloadOrError =
+    MintPremiumCardToWalletPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+  | ErrNeedsToReconnectSocial
+
+input MoveCollectionToGalleryInput {
+  sourceCollectionId: DBID!
+  targetGalleryId: DBID!
+}
+
+type MoveCollectionToGalleryPayload {
+  oldGallery: Gallery
+  newGallery: Gallery
+}
+
+union MoveCollectionToGalleryPayloadOrError =
+    MoveCollectionToGalleryPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+
+type Mutation {
+  addUserWallet(
+    chainAddress: ChainAddressInput!
+    authMechanism: AuthMechanism!
+  ): AddUserWalletPayloadOrError
+  removeUserWallets(walletIds: [DBID!]!): RemoveUserWalletsPayloadOrError
+  updateUserInfo(input: UpdateUserInfoInput!): UpdateUserInfoPayloadOrError
+  registerUserPushToken(pushToken: String!): RegisterUserPushTokenPayloadOrError
+  unregisterUserPushToken(pushToken: String!): UnregisterUserPushTokenPayloadOrError
+  setProfileImage(input: SetProfileImageInput!): SetProfileImagePayloadOrError
+  removeProfileImage: RemoveProfileImagePayloadOrError
+  reportPost(postId: DBID!, reason: ReportReason!): ReportPostPayloadOrError
+  blockUser(userId: DBID!): BlockUserPayloadOrError
+  unblockUser(userId: DBID!): UnblockUserPayloadOrError
+  updateGalleryCollections(
+    input: UpdateGalleryCollectionsInput!
+  ): UpdateGalleryCollectionsPayloadOrError
+  createCollection(input: CreateCollectionInput!): CreateCollectionPayloadOrError
+  deleteCollection(collectionId: DBID!): DeleteCollectionPayloadOrError
+  updateCollectionInfo(input: UpdateCollectionInfoInput!): UpdateCollectionInfoPayloadOrError
+  updateCollectionTokens(input: UpdateCollectionTokensInput!): UpdateCollectionTokensPayloadOrError
+  updateCollectionHidden(input: UpdateCollectionHiddenInput!): UpdateCollectionHiddenPayloadOrError
+  updateTokenInfo(input: UpdateTokenInfoInput!): UpdateTokenInfoPayloadOrError
+  setSpamPreference(input: SetSpamPreferenceInput!): SetSpamPreferencePayloadOrError
+  syncTokens(chains: [Chain!], incrementally: Boolean): SyncTokensPayloadOrError
+  syncCreatedTokensForNewContracts(
+    input: SyncCreatedTokensForNewContractsInput!
+  ): SyncCreatedTokensForNewContractsPayloadOrError
+  syncCreatedTokensForExistingContract(
+    input: SyncCreatedTokensForExistingContractInput!
+  ): SyncCreatedTokensForExistingContractPayloadOrError
+  refreshToken(tokenId: DBID!): RefreshTokenPayloadOrError
+  refreshCollection(collectionId: DBID!): RefreshCollectionPayloadOrError
+  refreshContract(contractId: DBID!): RefreshContractPayloadOrError
+  getAuthNonce: GetAuthNoncePayloadOrError
+  createUser(authMechanism: AuthMechanism!, input: CreateUserInput!): CreateUserPayloadOrError
+  updateEmail(input: UpdateEmailInput!): UpdateEmailPayloadOrError
+  resendVerificationEmail: ResendVerificationEmailPayloadOrError
+  updateEmailNotificationSettings(
+    input: UpdateEmailNotificationSettingsInput!
+  ): UpdateEmailNotificationSettingsPayloadOrError
+  unsubscribeFromEmailType(
+    input: UnsubscribeFromEmailTypeInput!
+  ): UnsubscribeFromEmailTypePayloadOrError
+  login(authMechanism: AuthMechanism!): LoginPayloadOrError
+  logout(pushTokenToUnregister: String): LogoutPayload
+  connectSocialAccount(
+    input: SocialAuthMechanism!
+    display: Boolean! = true
+  ): ConnectSocialAccountPayloadOrError
+  disconnectSocialAccount(accountType: SocialAccountType!): DisconnectSocialAccountPayloadOrError
+  updateSocialAccountDisplayed(
+    input: UpdateSocialAccountDisplayedInput!
+  ): UpdateSocialAccountDisplayedPayloadOrError
+  followUser(userId: DBID!): FollowUserPayloadOrError
+  followAllSocialConnections(
+    accountType: SocialAccountType!
+  ): FollowAllSocialConnectionsPayloadOrError
+  followAllOnboardingRecommendations(
+    """
+    A cursor returned from `Viewer.suggestedUsers` can be provided to follow all users from when the
+    cursor was generated. Otherwise, all users from the current recommendation set will be followed instead.
+    """
+    cursor: String
+  ): FollowAllOnboardingRecommendationsPayloadOrError
+  unfollowUser(userId: DBID!): UnfollowUserPayloadOrError
+  admireFeedEvent(feedEventId: DBID!): AdmireFeedEventPayloadOrError
+  admirePost(postId: DBID!): AdmirePostPayloadOrError
+  admireToken(tokenId: DBID!): AdmireTokenPayloadOrError
+  admireComment(commentId: DBID!): AdmireCommentPayloadOrError
+  removeAdmire(admireId: DBID!): RemoveAdmirePayloadOrError
+  commentOnFeedEvent(
+    feedEventId: DBID!
+    replyToID: DBID
+    comment: String!
+    mentions: [MentionInput!]
+  ): CommentOnFeedEventPayloadOrError
+  removeComment(commentId: DBID!): RemoveCommentPayloadOrError
+  commentOnPost(
+    postId: DBID!
+    replyToID: DBID
+    comment: String!
+    mentions: [MentionInput!]
+  ): CommentOnPostPayloadOrError
+  postTokens(input: PostTokensInput!): PostTokensPayloadOrError
+  referralPostToken(input: ReferralPostTokenInput!): ReferralPostTokenPayloadOrError
+  referralPostPreflight(input: ReferralPostPreflightInput!): ReferralPostPreflightPayloadOrError
+  deletePost(postId: DBID!): DeletePostPayloadOrError
+  highlightClaimMint(input: HighlightClaimMintInput!): HighlightClaimMintPayloadOrError
+  viewGallery(galleryId: DBID!): ViewGalleryPayloadOrError
+  viewToken(tokenID: DBID!, collectionID: DBID!): ViewTokenPayloadOrError
+  updateGallery(input: UpdateGalleryInput!): UpdateGalleryPayloadOrError
+  publishGallery(input: PublishGalleryInput!): PublishGalleryPayloadOrError
+  createGallery(input: CreateGalleryInput!): CreateGalleryPayloadOrError
+  updateGalleryHidden(input: UpdateGalleryHiddenInput!): UpdateGalleryHiddenPayloadOrError
+  deleteGallery(galleryId: DBID!): DeleteGalleryPayloadOrError
+  updateGalleryOrder(input: UpdateGalleryOrderInput!): UpdateGalleryOrderPayloadOrError
+  updateGalleryInfo(input: UpdateGalleryInfoInput!): UpdateGalleryInfoPayloadOrError
+  updateFeaturedGallery(galleryId: DBID!): UpdateFeaturedGalleryPayloadOrError
+  clearAllNotifications: ClearAllNotificationsPayload
+  updateNotificationSettings(settings: NotificationSettingsInput): NotificationSettings
+  preverifyEmail(input: PreverifyEmailInput!): PreverifyEmailPayloadOrError
+  verifyEmail(input: VerifyEmailInput!): VerifyEmailPayloadOrError
+  verifyEmailMagicLink(input: VerifyEmailMagicLinkInput!): VerifyEmailMagicLinkPayloadOrError
+  redeemMerch(input: RedeemMerchInput!): RedeemMerchPayloadOrError
+  optInForRoles(roles: [Role!]!): OptInForRolesPayloadOrError
+  optOutForRoles(roles: [Role!]!): OptOutForRolesPayloadOrError
+  setPersona(persona: Persona!): SetPersonaPayloadOrError
+  addRolesToUser(username: String!, roles: [Role]): AddRolesToUserPayloadOrError
+  addWalletToUserUnchecked(input: AdminAddWalletInput!): AdminAddWalletPayloadOrError
+  revokeRolesFromUser(username: String!, roles: [Role]): RevokeRolesFromUserPayloadOrError
+  syncTokensForUsername(username: String!, chains: [Chain!]!): SyncTokensForUsernamePayloadOrError
+  syncCreatedTokensForUsername(
+    username: String!
+    chains: [Chain!]!
+  ): SyncCreatedTokensForUsernamePayloadOrError
+  syncCreatedTokensForUsernameAndExistingContract(
+    username: String!
+    chainAddress: ChainAddressInput!
+  ): SyncCreatedTokensForUsernameAndExistingContractPayloadOrError
+  banUserFromFeed(username: String!, reason: ReportReason!): BanUserFromFeedPayloadOrError
+  unbanUserFromFeed(username: String!): UnbanUserFromFeedPayloadOrError
+  mintPremiumCardToWallet(
+    input: MintPremiumCardToWalletInput!
+  ): MintPremiumCardToWalletPayloadOrError
+  setCommunityOverrideCreator(
+    communityID: DBID!
+    creatorUserID: DBID
+  ): SetCommunityOverrideCreatorPayloadOrError
+  uploadPersistedQueries(input: UploadPersistedQueriesInput): UploadPersistedQueriesPayloadOrError
+  updatePrimaryWallet(walletID: DBID!): UpdatePrimaryWalletPayloadOrError
+  updateUserExperience(input: UpdateUserExperienceInput!): UpdateUserExperiencePayloadOrError
+  moveCollectionToGallery(
+    input: MoveCollectionToGalleryInput
+  ): MoveCollectionToGalleryPayloadOrError
+  generateQRCodeLoginToken: GenerateQRCodeLoginTokenPayloadOrError
+}
+
+type NewTokensNotification implements Notification & GroupedNotification & Node {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  count: Int
+  token: Token
+}
+
+input NeynarAuth {
+  custodyPubKey: ChainPubKeyInput!
+  nonce: String!
+  message: String!
+  signature: String!
+
+  """
+  primaryPubKey is an optional parameter that lets callers specify a different wallet to use with Gallery, provided
+  that both primaryPubKey and the required custodyPubKey are owned by the same Neynar user
+  """
+  primaryPubKey: ChainPubKeyInput
+}
+
+interface Node {
+  id: ID!
+}
+
+interface Notification {
+  id: ID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+}
+
+type NotificationEdge {
+  node: Notification
+  cursor: String
+}
+
+type NotificationsConnection {
+  edges: [NotificationEdge]
+  unseenCount: Int
+  pageInfo: PageInfo
+}
+
+type NotificationSettings {
+  someoneFollowedYou: Boolean
+  someoneAdmiredYourUpdate: Boolean
+  someoneCommentedOnYourUpdate: Boolean
+  someoneViewedYourGallery: Boolean
+}
+
+input NotificationSettingsInput {
+  someoneFollowedYou: Boolean
+  someoneAdmiredYourUpdate: Boolean
+  someoneCommentedOnYourUpdate: Boolean
+  someoneViewedYourGallery: Boolean
+}
+
+input OneTimeLoginTokenAuth {
+  token: String!
+}
+
+type OptInForRolesPayload {
+  user: GalleryUser
+}
+
+union OptInForRolesPayloadOrError = OptInForRolesPayload | ErrNotAuthorized | ErrInvalidInput
+
+type OptOutForRolesPayload {
+  user: GalleryUser
+}
+
+union OptOutForRolesPayloadOrError = OptOutForRolesPayload | ErrNotAuthorized | ErrInvalidInput
+
+type OwnerAtBlock {
+  owner: GalleryUserOrAddress
+  blockNumber: String
+}
+
+type PageInfo {
+  total: Int
+  size: Int!
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
+  startCursor: String!
+  endCursor: String!
+}
+
+type PdfMedia implements Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURL: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+enum Persona {
+  None
+  Collector
+  Creator
+  Both
+}
+
+enum Platform {
+  Web
+  Mobile
+  All
+}
+
+type Post implements Node {
+  id: ID!
+  dbid: DBID!
+  author: GalleryUser
+  creationTime: Time
+  tokens: [Token]
+  caption: String
+  mentions: [Mention]
+  admires(before: String, after: String, first: Int, last: Int): PostAdmiresConnection
+  comments(before: String, after: String, first: Int, last: Int): PostCommentsConnection
+  totalComments: Int
+  interactions(before: String, after: String, first: Int, last: Int): InteractionsConnection
+  viewerAdmire: Admire
+  isFirstPost: Boolean!
+  userAddedMintURL: String
+}
+
+type PostAdmireEdge {
+  node: Admire
+  cursor: String
+}
+
+type PostAdmiresConnection {
+  edges: [PostAdmireEdge]
+  pageInfo: PageInfo!
+}
+
+type PostCommentEdge {
+  node: Comment
+  cursor: String
+}
+
+type PostCommentsConnection {
+  edges: [PostCommentEdge]
+  pageInfo: PageInfo!
+}
+
+input PostComposerDraftDetailsInput {
+  token: ChainAddressTokenInput!
+}
+
+type PostComposerDraftDetailsPayload {
+  media(darkMode: DarkMode): MediaSubtype
+  community: Community
+  tokenName: String
+  tokenDescription: String
+}
+
+union PostComposerDraftDetailsPayloadOrError =
+    PostComposerDraftDetailsPayload
+  | ErrInvalidInput
+  | ErrCommunityNotFound
+
+type PostEdge {
+  node: PostOrError
+  cursor: String
+}
+
+union PostOrError = Post | ErrPostNotFound | ErrInvalidInput
+
+type PostsConnection {
+  edges: [PostEdge]
+  pageInfo: PageInfo!
+}
+
+input PostTokensInput {
+  tokenIds: [DBID!]
+  caption: String
+  mentions: [MentionInput!]
+  mintURL: String
+}
+
+type PostTokensPayload {
+  post: Post!
+}
+
+union PostTokensPayloadOrError = PostTokensPayload | ErrInvalidInput | ErrNotAuthorized
+
+input PreverifyEmailInput {
+  email: Email!
+}
+
+type PreverifyEmailPayload {
+  email: Email!
+  result: PreverifyEmailResult!
+}
+
+union PreverifyEmailPayloadOrError = PreverifyEmailPayload | ErrInvalidInput
+
+enum PreverifyEmailResult {
+  Invalid
+  Risky
+  Valid
+}
+
+type PreviewURLSet {
+  raw: String
+  thumbnail: String
+  small: String
+  medium: String
+  large: String
+  srcSet: String
+  liveRender: String
+  blurhash: String
+}
+
+input PrivyAuth {
+  token: String!
+}
+
+union ProfileImage = TokenProfileImage | EnsProfileImage
+
+scalar PubKey
+
+input PublishGalleryInput {
+  galleryId: DBID!
+  editId: String!
+  caption: String
+}
+
+type PublishGalleryPayload {
+  gallery: Gallery
+}
+
+union PublishGalleryPayloadOrError = PublishGalleryPayload | ErrInvalidInput | ErrNotAuthorized
+
+type Query {
+  node(id: ID!): Node
+  viewer: ViewerOrError
+  userByUsername(username: String!): UserByUsernameOrError
+  userById(id: DBID!): UserByIdOrError
+  userByAddress(chainAddress: ChainAddressInput!): UserByAddressOrError
+  usersByAddresses(chainAddresses: [ChainAddressInput!]!): UsersByAddressesPayloadOrError
+  usersWithTrait(trait: String!): [GalleryUser]
+  membershipTiers(forceRefresh: Boolean): [MembershipTier]
+  collectionById(id: DBID!): CollectionByIdOrError
+  collectionsByIds(ids: [DBID!]!): [CollectionByIdOrError]
+  tokenById(id: DBID!): TokenByIdOrError
+  collectionTokenById(tokenId: DBID!, collectionId: DBID!): CollectionTokenByIdOrError
+  communityByAddress(
+    communityAddress: ChainAddressInput!
+    forceRefresh: Boolean
+  ): CommunityByAddressOrError
+  communityById(id: DBID!): CommunityByIdOrError
+  generalAllowlist: [ChainAddress!]
+  galleryOfTheWeekWinners: [GalleryUser!]
+  globalFeed(before: String, after: String, first: Int, last: Int): FeedConnection
+  trendingFeed(before: String, after: String, first: Int, last: Int): FeedConnection
+  curatedFeed(before: String, after: String, first: Int, last: Int): FeedConnection
+  feedEventById(id: DBID!): FeedEventByIdOrError
+  postById(id: DBID!): PostOrError
+  getMerchTokens(wallet: Address!): MerchTokensPayloadOrError
+  galleryById(id: DBID!): GalleryByIdPayloadOrError
+  viewerGalleryById(id: DBID!): ViewerGalleryByIdPayloadOrError
+  trendingUsers(input: TrendingUsersInput!): TrendingUsersPayloadOrError
+
+  """
+  Search for users with optional weighting. Weights are floats in the [0.0. 1.0] range
+  that help determine how matches will be ranked. usernameWeight defaults to 0.4 and
+  bioWeight defaults to 0.2, meaning that a search result matching a username is considered
+  twice as relevant as a search result matching a bio.
+  """
+  searchUsers(
+    query: String!
+    limit: Int
+    usernameWeight: Float
+    bioWeight: Float
+  ): SearchUsersPayloadOrError
+
+  """
+  Search for galleries with optional weighting. Weights are floats in the [0.0. 1.0] range
+  that help determine how matches will be ranked. nameWeight defaults to 0.4 and
+  descriptionWeight defaults to 0.2, meaning that a search result matching a gallery name is
+  considered twice as relevant as a search result matching a gallery description.
+  """
+  searchGalleries(
+    query: String!
+    limit: Int
+    nameWeight: Float
+    descriptionWeight: Float
+  ): SearchGalleriesPayloadOrError
+
+  """
+  Search for communities with optional weighting. Weights are floats in the [0.0. 1.0] range
+  that help determine how matches will be ranked. nameWeight defaults to 0.4, providerNameWeight
+  defaults to 0.3, descriptionWeight defaults to 0.2, and poapAddressWeight defaults to 0.1,
+  meaning that a search result matching a community name is considered twice as relevant as a
+  search result matching a community description, and four times as relevant as a search result
+  matching a POAP address string. providerNameWeight is used to return communities provided by
+  a provider (e.g. Art Blocks) when searching for that provider's name (e.g. "art blocks").
+  """
+  searchCommunities(
+    query: String!
+    limit: Int
+    nameWeight: Float
+    descriptionWeight: Float
+    poapAddressWeight: Float
+    providerNameWeight: Float
+  ): SearchCommunitiesPayloadOrError
+  isEmailAddressAvailable(emailAddress: Email!): Boolean
+  usersByRole(role: Role!, before: String, after: String, first: Int, last: Int): UsersConnection
+  socialConnections(
+    socialAccountType: SocialAccountType!
+    excludeAlreadyFollowing: Boolean
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): SocialConnectionsConnection
+  socialQueries: SocialQueriesOrError
+  topCollectionsForCommunity(
+    input: topCollectionsForCommunityInput!
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): CollectionsConnection
+  postComposerDraftDetails(
+    input: PostComposerDraftDetailsInput!
+  ): PostComposerDraftDetailsPayloadOrError
+  contractCommunityByKey(key: ContractCommunityKeyInput!): CommunityByKeyOrError
+  artBlocksCommunityByKey(key: ArtBlocksCommunityKeyInput!): CommunityByKeyOrError
+  highlightMintClaimStatus(claimId: DBID!): HighlightMintClaimStatusPayloadOrError
+}
+
+input RedeemMerchInput {
+  tokenIds: [String!]!
+  address: ChainAddressInput!
+  walletType: WalletType!
+  signature: String!
+}
+
+type RedeemMerchPayload {
+  tokens: [MerchToken]
+}
+
+union RedeemMerchPayloadOrError = RedeemMerchPayload | ErrInvalidInput
+
+input ReferralPostPreflightInput {
+  token: ChainAddressTokenInput!
+}
+
+type ReferralPostPreflightPayload {
+  accepted: Boolean!
+}
+
+union ReferralPostPreflightPayloadOrError = ReferralPostPreflightPayload | ErrInvalidInput
+
+input ReferralPostTokenInput {
+  token: ChainAddressTokenInput!
+  caption: String
+  mintURL: String
+}
+
+type ReferralPostTokenPayload {
+  post: Post!
+}
+
+union ReferralPostTokenPayloadOrError =
+    ReferralPostTokenPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+  | ErrTokenNotFound
+
+type RefreshCollectionPayload {
+  collection: Collection
+}
+
+union RefreshCollectionPayloadOrError = RefreshCollectionPayload | ErrInvalidInput | ErrSyncFailed
+
+type RefreshContractPayload {
+  contract: Contract
+}
+
+union RefreshContractPayloadOrError = RefreshContractPayload | ErrInvalidInput | ErrSyncFailed
+
+type RefreshTokenPayload {
+  token: Token
+}
+
+union RefreshTokenPayloadOrError =
+    RefreshTokenPayload
+  | ErrInvalidInput
+  | ErrSyncFailed
+  | ErrTokenNotFound
+
+type RegisterUserPushTokenPayload {
+  viewer: Viewer
+}
+
+union RegisterUserPushTokenPayloadOrError =
+    RegisterUserPushTokenPayload
+  | ErrNotAuthorized
+  | ErrInvalidInput
+  | ErrPushTokenBelongsToAnotherUser
+
+type RemoveAdmirePayload {
+  viewer: Viewer
+  admireID: DBID
+  feedEvent: FeedEvent
+  post: Post
+}
+
+union RemoveAdmirePayloadOrError =
+    RemoveAdmirePayload
+  | ErrAuthenticationFailed
+  | ErrFeedEventNotFound
+  | ErrInvalidInput
+  | ErrAdmireNotFound
+
+type RemoveCommentPayload {
+  viewer: Viewer
+  feedEvent: FeedEvent
+  post: Post
+}
+
+union RemoveCommentPayloadOrError =
+    RemoveCommentPayload
+  | ErrAuthenticationFailed
+  | ErrFeedEventNotFound
+  | ErrInvalidInput
+  | ErrCommentNotFound
+
+type RemoveProfileImagePayload {
+  viewer: Viewer
+}
+
+union RemoveProfileImagePayloadOrError =
+    RemoveProfileImagePayload
+  | ErrAuthenticationFailed
+  | ErrUserNotFound
+
+type RemoveUserWalletsPayload {
+  viewer: Viewer
+}
+
+union RemoveUserWalletsPayloadOrError =
+    RemoveUserWalletsPayload
+  | ErrNotAuthorized
+  | ErrInvalidInput
+
+type ReportPostPayload {
+  postId: DBID!
+}
+
+union ReportPostPayloadOrError = ReportPostPayload | ErrInvalidInput | ErrPostNotFound
+
+enum ReportReason {
+  INAPPROPRIATE_CONTENT
+  SPAM_AND_OR_BOT
+  SOMETHING_ELSE
+}
+
+enum ReportWindow {
+  LAST_5_DAYS
+  LAST_7_DAYS
+  ALL_TIME
+}
+
+type ResendVerificationEmailPayload {
+  viewer: Viewer
+}
+
+union ResendVerificationEmailPayloadOrError = ResendVerificationEmailPayload | ErrInvalidInput
+
+union RevokeRolesFromUserPayloadOrError = GalleryUser | ErrNotAuthorized
+
+enum Role {
+  ADMIN
+  BETA_TESTER
+  EARLY_ACCESS
+  EMAIL_TESTER
+}
+
+type SearchCommunitiesPayload {
+  results: [CommunitySearchResult!]
+}
+
+union SearchCommunitiesPayloadOrError = SearchCommunitiesPayload | ErrInvalidInput
+
+type SearchGalleriesPayload {
+  results: [GallerySearchResult!]
+}
+
+union SearchGalleriesPayloadOrError = SearchGalleriesPayload | ErrInvalidInput
+
+type SearchUsersPayload {
+  results: [UserSearchResult!]
+}
+
+union SearchUsersPayloadOrError = SearchUsersPayload | ErrInvalidInput
+
+type SetCommunityOverrideCreatorPayload {
+  user: GalleryUser
+}
+
+union SetCommunityOverrideCreatorPayloadOrError =
+    SetCommunityOverrideCreatorPayload
+  | ErrNotAuthorized
+
+type SetPersonaPayload {
+  viewer: Viewer
+}
+
+union SetPersonaPayloadOrError = SetPersonaPayload | ErrNotAuthorized | ErrInvalidInput
+
+input SetProfileImageInput {
+  tokenId: DBID
+  walletAddress: ChainAddressInput
+}
+
+type SetProfileImagePayload {
+  viewer: Viewer
+}
+
+union SetProfileImagePayloadOrError =
+    SetProfileImagePayload
+  | ErrAuthenticationFailed
+  | ErrUserNotFound
+  | ErrInvalidInput
+  | ErrTokenNotFound
+  | ErrNotAuthorized
+  | ErrNoAvatarRecordSet
+
+input SetSpamPreferenceInput {
+  tokens: [DBID!]!
+  isSpam: Boolean!
+}
+
+type SetSpamPreferencePayload {
+  tokens: [Token]
+}
+
+union SetSpamPreferencePayloadOrError = SetSpamPreferencePayload | ErrNotAuthorized
+
+interface SocialAccount {
+  type: SocialAccountType!
+  social_id: String!
+  display: Boolean!
+}
+
+type SocialAccounts {
+  twitter: TwitterSocialAccount
+  farcaster: FarcasterSocialAccount
+  lens: LensSocialAccount
+}
+
+enum SocialAccountType {
+  Twitter
+  Farcaster
+  Lens
+}
+
+input SocialAuthMechanism {
+  twitter: TwitterAuth
+  debug: DebugSocialAuth
+  farcaster: FarcasterAuth
+  lens: LensAuth
+}
+
+type SocialConnection implements Node {
+  id: ID!
+  galleryUser: GalleryUser
+  currentlyFollowing: Boolean!
+  socialId: String!
+  socialType: SocialAccountType!
+  displayName: String!
+  socialUsername: String!
+  profileImage: String!
+}
+
+type SocialConnectionsConnection {
+  edges: [SocialConnectionsEdge]
+  pageInfo: PageInfo!
+}
+
+type SocialConnectionsEdge {
+  node: SocialConnectionsOrError
+  cursor: String
+}
+
+union SocialConnectionsOrError = SocialConnection | ErrInvalidInput
+
+type SocialQueries {
+  socialConnections(
+    socialAccountType: SocialAccountType!
+    excludeAlreadyFollowing: Boolean
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): SocialConnectionsConnection
+}
+
+union SocialQueriesOrError = SocialQueries | ErrNotAuthorized | ErrNeedsToReconnectSocial
+
+type SomeoneAdmiredYourCommentNotification implements Notification & Node & GroupedNotification {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  count: Int
+  comment: Comment
+  admirers(before: String, after: String, first: Int, last: Int): GroupNotificationUsersConnection
+}
+
+type SomeoneAdmiredYourFeedEventNotification implements Notification & Node & GroupedNotification {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  count: Int
+  feedEvent: FeedEvent
+  admirers(before: String, after: String, first: Int, last: Int): GroupNotificationUsersConnection
+}
+
+type SomeoneAdmiredYourPostNotification implements Notification & Node & GroupedNotification {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  count: Int
+  post: Post
+  admirers(before: String, after: String, first: Int, last: Int): GroupNotificationUsersConnection
+}
+
+type SomeoneAdmiredYourTokenNotification implements Notification & Node & GroupedNotification {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  count: Int
+  token: Token
+  admirers(before: String, after: String, first: Int, last: Int): GroupNotificationUsersConnection
+}
+
+type SomeoneCommentedOnYourFeedEventNotification implements Notification & Node {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  comment: Comment
+  feedEvent: FeedEvent
+}
+
+type SomeoneCommentedOnYourPostNotification implements Notification & Node {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  comment: Comment
+  post: Post
+}
+
+type SomeoneFollowedYouBackNotification implements Notification & Node & GroupedNotification {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  count: Int
+  followers(before: String, after: String, first: Int, last: Int): GroupNotificationUsersConnection
+}
+
+type SomeoneFollowedYouNotification implements Notification & Node & GroupedNotification {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  count: Int
+  followers(before: String, after: String, first: Int, last: Int): GroupNotificationUsersConnection
+}
+
+type SomeoneMentionedYouNotification implements Notification & Node {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  mentionSource: MentionSource
+}
+
+type SomeoneMentionedYourCommunityNotification implements Notification & Node {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  mentionSource: MentionSource
+  community: Community
+}
+
+type SomeonePostedYourWorkNotification implements Notification & Node {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  post: Post
+  community: Community
+}
+
+type SomeoneRepliedToYourCommentNotification implements Notification & Node {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  comment: Comment
+  originalComment: Comment
+}
+
+type SomeoneViewedYourGalleryNotification implements Notification & Node & GroupedNotification {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  count: Int
+  userViewers(
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): GroupNotificationUsersConnection
+  nonUserViewerCount: Int
+  gallery: Gallery
+}
+
+type SomeoneYouFollowOnFarcasterJoinedNotification implements Notification & Node {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  user: GalleryUser
+}
+
+type SomeoneYouFollowPostedTheirFirstPostNotification implements Notification & Node {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  post: Post
+}
+
+type Subscription {
+  newNotification: Notification
+  notificationUpdated: Notification
+}
+
+input SyncCreatedTokensForExistingContractInput {
+  contractId: DBID!
+}
+
+type SyncCreatedTokensForExistingContractPayload {
+  viewer: Viewer
+}
+
+union SyncCreatedTokensForExistingContractPayloadOrError =
+    SyncCreatedTokensForExistingContractPayload
+  | ErrNotAuthorized
+  | ErrSyncFailed
+
+input SyncCreatedTokensForNewContractsInput {
+  includeChains: [Chain!]
+  incrementally: Boolean
+}
+
+type SyncCreatedTokensForNewContractsPayload {
+  viewer: Viewer
+}
+
+union SyncCreatedTokensForNewContractsPayloadOrError =
+    SyncCreatedTokensForNewContractsPayload
+  | ErrNotAuthorized
+  | ErrSyncFailed
+
+type SyncCreatedTokensForUsernameAndExistingContractPayload {
+  message: String!
+}
+
+union SyncCreatedTokensForUsernameAndExistingContractPayloadOrError =
+    SyncCreatedTokensForUsernameAndExistingContractPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+  | ErrSyncFailed
+  | ErrCommunityNotFound
+
+type SyncCreatedTokensForUsernamePayload {
+  message: String!
+}
+
+union SyncCreatedTokensForUsernamePayloadOrError =
+    SyncCreatedTokensForUsernamePayload
+  | ErrNotAuthorized
+  | ErrSyncFailed
+
+type SyncingMedia implements Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURL: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+type SyncTokensForUsernamePayload {
+  message: String!
+}
+
+union SyncTokensForUsernamePayloadOrError =
+    SyncTokensForUsernamePayload
+  | ErrNotAuthorized
+  | ErrSyncFailed
+
+type SyncTokensPayload {
+  viewer: Viewer
+}
+
+union SyncTokensPayloadOrError = SyncTokensPayload | ErrNotAuthorized | ErrSyncFailed
+
+type TextMedia implements Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURL: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+scalar Time
+
+type Token implements Node {
+  id: ID!
+  dbid: DBID!
+  creationTime: Time
+  lastUpdated: Time
+  collectorsNote: String
+  quantity: String
+  owner: GalleryUser
+  ownedByWallets: [Wallet]
+  ownershipHistory: [OwnerAtBlock] @deprecated
+  ownerIsHolder: Boolean
+  ownerIsCreator: Boolean
+  definition: TokenDefinition!
+  isSpamByUser: Boolean
+  admires(
+    before: String
+    after: String
+    first: Int
+    last: Int
+    userID: DBID
+  ): TokenAdmiresConnection
+  viewerAdmire: Admire
+  media(darkMode: DarkMode): MediaSubtype @deprecated(reason: "Use definition.media instead")
+  tokenType: TokenType @deprecated(reason: "Use definition.tokenType instead")
+  chain: Chain @deprecated(reason: "Use definition.chain instead")
+  name: String @deprecated(reason: "Use definition.name instead")
+  description: String @deprecated(reason: "Use definition.description instead")
+  tokenId: String @deprecated(reason: "Use definition.tokenId instead")
+  tokenMetadata: String @deprecated(reason: "Use definition.tokenMetadata instead")
+  contract: Contract @deprecated(reason: "Use definition.contract instead")
+  community: Community @deprecated(reason: "Use definition.community instead")
+  externalUrl: String @deprecated(reason: "Use definition.externalUrl instead")
+  isSpamByProvider: Boolean @deprecated(reason: "Use definition.community.contract.isSpam instead")
+  creatorAddress: ChainAddress
+    @deprecated(reason: "Use definition.community.creatorAddress instead")
+  openseaCollectionName: String @deprecated
+  blockNumber: String @deprecated
+  openseaId: Int @deprecated
+}
+
+type TokenAdmireEdge {
+  node: Admire
+  cursor: String
+  token: Token
+}
+
+type TokenAdmiresConnection {
+  edges: [TokenAdmireEdge]
+  pageInfo: PageInfo
+}
+
+union TokenByIdOrError = Token | ErrTokenNotFound
+
+type TokenDefinition implements Node {
+  id: ID!
+  dbid: DBID!
+  creationTime: Time
+  lastUpdated: Time
+  media(darkMode: DarkMode): MediaSubtype
+  tokenType: TokenType
+  contract: Contract
+  chain: Chain
+  name: String
+  description: String
+  tokenId: String
+  tokenMetadata: String
+  community: Community
+  communities: [Community]
+  externalUrl: String
+  mintUrl: String
+}
+
+type TokenEdge {
+  node: Token
+  cursor: String
+}
+
+type TokenHolder {
+  displayName: String
+  wallets: [Wallet]
+  user: GalleryUser
+  previewTokens: [String]
+}
+
+type TokenHolderEdge {
+  node: TokenHolder
+  cursor: String
+}
+
+type TokenHoldersConnection {
+  edges: [TokenHolderEdge]
+  pageInfo: PageInfo!
+}
+
+scalar TokenId
+
+enum TokenOwnershipType {
+  Holder
+  Creator
+}
+
+type TokenProfileImage {
+  token: Token!
+}
+
+type TokensAddedToCollectionFeedEventData implements FeedEventData {
+  eventTime: Time
+  owner: GalleryUser
+  collection: Collection
+  action: Action
+  newTokens: [CollectionToken]
+  isPreFeed: Boolean
+}
+
+type TokensConnection {
+  edges: [TokenEdge]
+  pageInfo: PageInfo!
+}
+
+enum TokenType {
+  ERC721
+  ERC1155
+  ERC20
+}
+
+input topCollectionsForCommunityInput {
+  chainAddress: ChainAddressInput!
+}
+
+input TrendingUsersInput {
+  report: ReportWindow!
+}
+
+type TrendingUsersPayload {
+  users: [GalleryUser!]
+}
+
+union TrendingUsersPayloadOrError = TrendingUsersPayload
+
+input TwitterAuth {
+  code: String!
+}
+
+type TwitterSocialAccount implements SocialAccount {
+  type: SocialAccountType!
+  social_id: String!
+  name: String!
+  username: String!
+  profileImageURL: String!
+  display: Boolean!
+  scope: String!
+}
+
+type UnbanUserFromFeedPayload {
+  user: GalleryUser
+}
+
+union UnbanUserFromFeedPayloadOrError = UnbanUserFromFeedPayload | ErrNotAuthorized
+
+type UnblockUserPayload {
+  userId: DBID!
+}
+
+union UnblockUserPayloadOrError =
+    UnblockUserPayload
+  | ErrUserNotFound
+  | ErrNotAuthorized
+  | ErrInvalidInput
+
+type UnfollowUserPayload {
+  viewer: Viewer
+  user: GalleryUser
+}
+
+union UnfollowUserPayloadOrError =
+    UnfollowUserPayload
+  | ErrAuthenticationFailed
+  | ErrUserNotFound
+  | ErrInvalidInput
+
+type UnknownMedia implements Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURL: String
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+type UnregisterUserPushTokenPayload {
+  viewer: Viewer
+}
+
+union UnregisterUserPushTokenPayloadOrError =
+    UnregisterUserPushTokenPayload
+  | ErrNotAuthorized
+  | ErrInvalidInput
+  | ErrPushTokenBelongsToAnotherUser
+
+input UnsubscribeFromEmailTypeInput {
+  type: EmailUnsubscriptionType!
+  token: String!
+}
+
+type UnsubscribeFromEmailTypePayload {
+  viewer: Viewer
+}
+
+union UnsubscribeFromEmailTypePayloadOrError = UnsubscribeFromEmailTypePayload | ErrInvalidInput
+
+input UpdateCollectionHiddenInput {
+  collectionId: DBID!
+  hidden: Boolean!
+}
+
+type UpdateCollectionHiddenPayload {
+  collection: Collection
+}
+
+union UpdateCollectionHiddenPayloadOrError =
+    UpdateCollectionHiddenPayload
+  | ErrNotAuthorized
+  | ErrInvalidInput
+
+input UpdateCollectionInfoInput {
+  collectionId: DBID!
+  name: String!
+  collectorsNote: String!
+}
+
+type UpdateCollectionInfoPayload {
+  collection: Collection
+}
+
+union UpdateCollectionInfoPayloadOrError =
+    UpdateCollectionInfoPayload
+  | ErrNotAuthorized
+  | ErrInvalidInput
+
+input UpdateCollectionInput {
+  dbid: DBID!
+  name: String!
+  collectorsNote: String!
+  tokens: [DBID!]!
+  layout: CollectionLayoutInput!
+  tokenSettings: [CollectionTokenSettingsInput!]!
+  hidden: Boolean!
+}
+
+input UpdateCollectionTokensInput {
+  collectionId: DBID!
+  tokens: [DBID!]!
+  layout: CollectionLayoutInput!
+  tokenSettings: [CollectionTokenSettingsInput!]!
+  caption: String
+}
+
+type UpdateCollectionTokensPayload {
+  collection: Collection
+  feedEvent: FeedEvent
+}
+
+union UpdateCollectionTokensPayloadOrError =
+    UpdateCollectionTokensPayload
+  | ErrNotAuthorized
+  | ErrInvalidInput
+
+input UpdateEmailInput {
+  email: Email!
+  """
+  authMechanism is an optional parameter that can verify a user's email address in lieu of sending
+  a verification email to the user. If not provided, a verification email will be sent.
+  """
+  authMechanism: AuthMechanism
+}
+
+input UpdateEmailNotificationSettingsInput {
+  unsubscribedFromAll: Boolean!
+  unsubscribedFromNotifications: Boolean!
+  unsubscribedFromDigest: Boolean!
+  unsubscribedFromMarketing: Boolean
+  unsubscribedFromMembersClub: Boolean
+}
+
+type UpdateEmailNotificationSettingsPayload {
+  viewer: Viewer
+}
+
+union UpdateEmailNotificationSettingsPayloadOrError =
+    UpdateEmailNotificationSettingsPayload
+  | ErrInvalidInput
+
+type UpdateEmailPayload {
+  viewer: Viewer
+}
+
+union UpdateEmailPayloadOrError = UpdateEmailPayload | ErrInvalidInput
+
+type UpdateFeaturedGalleryPayload {
+  viewer: Viewer
+}
+
+union UpdateFeaturedGalleryPayloadOrError =
+    UpdateFeaturedGalleryPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+
+input UpdateGalleryCollectionsInput {
+  galleryId: DBID!
+  collections: [DBID!]!
+}
+
+type UpdateGalleryCollectionsPayload {
+  gallery: Gallery
+}
+
+union UpdateGalleryCollectionsPayloadOrError =
+    UpdateGalleryCollectionsPayload
+  | ErrNotAuthorized
+  | ErrInvalidInput
+
+input UpdateGalleryHiddenInput {
+  id: DBID!
+  hidden: Boolean!
+}
+
+type UpdateGalleryHiddenPayload {
+  gallery: Gallery
+}
+
+union UpdateGalleryHiddenPayloadOrError =
+    UpdateGalleryHiddenPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+
+input UpdateGalleryInfoInput {
+  id: DBID!
+  name: String
+  description: String
+}
+
+type UpdateGalleryInfoPayload {
+  gallery: Gallery
+}
+
+union UpdateGalleryInfoPayloadOrError =
+    UpdateGalleryInfoPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+
+input UpdateGalleryInput {
+  galleryId: DBID!
+  name: String
+  description: String
+  caption: String
+  deletedCollections: [DBID!]
+  updatedCollections: [UpdateCollectionInput]
+  createdCollections: [CreateCollectionInGalleryInput]
+  order: [DBID!]
+  editId: String
+}
+
+input UpdateGalleryOrderInput {
+  positions: [GalleryPositionInput!]!
+}
+
+type UpdateGalleryOrderPayload {
+  viewer: Viewer
+}
+
+union UpdateGalleryOrderPayloadOrError =
+    UpdateGalleryOrderPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+
+type UpdateGalleryPayload {
+  gallery: Gallery
+}
+
+union UpdateGalleryPayloadOrError = UpdateGalleryPayload | ErrInvalidInput | ErrNotAuthorized
+
+type UpdatePrimaryWalletPayload {
+  viewer: Viewer
+}
+
+union UpdatePrimaryWalletPayloadOrError =
+    UpdatePrimaryWalletPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+
+input UpdateSocialAccountDisplayedInput {
+  type: SocialAccountType!
+  displayed: Boolean!
+}
+
+type UpdateSocialAccountDisplayedPayload {
+  viewer: Viewer
+}
+
+union UpdateSocialAccountDisplayedPayloadOrError =
+    UpdateSocialAccountDisplayedPayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+  | ErrNeedsToReconnectSocial
+
+input UpdateTokenInfoInput {
+  tokenId: DBID!
+  collectorsNote: String!
+  collectionId: DBID
+}
+
+type UpdateTokenInfoPayload {
+  token: Token
+}
+
+union UpdateTokenInfoPayloadOrError = UpdateTokenInfoPayload | ErrNotAuthorized | ErrInvalidInput
+
+input UpdateUserExperienceInput {
+  experienceType: UserExperienceType!
+  experienced: Boolean!
+}
+
+type UpdateUserExperiencePayload {
+  viewer: Viewer
+}
+
+union UpdateUserExperiencePayloadOrError =
+    UpdateUserExperiencePayload
+  | ErrInvalidInput
+  | ErrNotAuthorized
+
+input UpdateUserInfoInput {
+  username: String!
+  bio: String!
+}
+
+type UpdateUserInfoPayload {
+  viewer: Viewer
+}
+
+union UpdateUserInfoPayloadOrError =
+    UpdateUserInfoPayload
+  | ErrNotAuthorized
+  | ErrUsernameNotAvailable
+  | ErrInvalidInput
+
+input UploadPersistedQueriesInput {
+  persistedQueries: String
+}
+
+type UploadPersistedQueriesPayload {
+  message: String
+}
+
+union UploadPersistedQueriesPayloadOrError = UploadPersistedQueriesPayload | ErrNotAuthorized
+
+union UserByAddressOrError = GalleryUser | ErrUserNotFound | ErrInvalidInput
+
+union UserByIdOrError = GalleryUser | ErrUserNotFound | ErrInvalidInput
+
+union UserByUsernameOrError = GalleryUser | ErrUserNotFound | ErrInvalidInput
+
+type UserCreatedFeedEventData implements FeedEventData {
+  eventTime: Time
+  owner: GalleryUser
+  action: Action
+}
+
+type UserEdge {
+  node: GalleryUser
+  cursor: String
+}
+
+type UserEmail {
+  email: Email
+  verificationStatus: EmailVerificationStatus
+  emailNotificationSettings: EmailNotificationSettings
+}
+
+type UserExperience {
+  type: UserExperienceType!
+  experienced: Boolean!
+}
+
+enum UserExperienceType {
+  MultiGalleryAnnouncement
+  EmailUpsell
+  MerchStoreUpsell
+  MaintenanceFeb2023
+  MaintenanceAug2023
+  TwitterConnectionOnboardingUpsell
+  UpsellMintMemento4
+  UpsellGallerySelects1
+  MobileUpsell1
+  MobileBetaUpsell
+  UpsellMintMemento5
+  UpsellBanner
+  PostsBetaAnnouncement
+  CreatorBetaFullscreenAnnouncementModal
+  CreatorBetaMicroAnnouncementModal
+  RadianceMintApr2024
+}
+
+type UserFollowedUsersFeedEventData implements FeedEventData {
+  eventTime: Time
+  owner: GalleryUser
+  action: Action
+  followed: [FollowInfo]
+}
+
+type UsersByAddressesPayload {
+  users: [GalleryUser!]
+}
+
+union UsersByAddressesPayloadOrError = UsersByAddressesPayload | ErrInvalidInput
+
+type UsersConnection {
+  edges: [UserEdge]
+  pageInfo: PageInfo!
+}
+
+type UserSearchResult {
+  user: GalleryUser
+}
+
+input VerifyEmailInput {
+  token: String!
+}
+
+input VerifyEmailMagicLinkInput {
+  email: Email!
+}
+
+type VerifyEmailMagicLinkPayload {
+  canSend: Boolean!
+}
+
+union VerifyEmailMagicLinkPayloadOrError = VerifyEmailMagicLinkPayload | ErrInvalidInput
+
+type VerifyEmailPayload {
+  email: Email!
+}
+
+union VerifyEmailPayloadOrError = VerifyEmailPayload | ErrInvalidInput
+
+type VideoMedia implements Media {
+  previewURLs: PreviewURLSet
+  mediaURL: String
+  mediaType: String
+  contentRenderURLs: VideoURLSet
+  dimensions: MediaDimensions
+  fallbackMedia: FallbackMedia
+}
+
+type VideoURLSet {
+  raw: String
+  small: String
+  medium: String
+  large: String
+}
+
+type Viewer implements Node {
+  id: ID!
+  user: GalleryUser
+  socialAccounts: SocialAccounts
+  viewerGalleries: [ViewerGallery]
+  feed(before: String, after: String, first: Int, last: Int): FeedConnection
+  email: UserEmail
+
+  """
+  Returns a list of notifications in reverse chronological order.
+  Seen notifications come after unseen notifications
+  """
+  notifications(before: String, after: String, first: Int, last: Int): NotificationsConnection
+  notificationSettings: NotificationSettings
+  userExperiences: [UserExperience!]
+  persona: Persona
+  suggestedUsers(before: String, after: String, first: Int, last: Int): UsersConnection
+  suggestedUsersFarcaster(before: String, after: String, first: Int, last: Int): UsersConnection
+}
+
+type ViewerGallery {
+  gallery: Gallery
+}
+
+union ViewerGalleryByIdPayloadOrError = ViewerGallery | ErrGalleryNotFound
+
+union ViewerOrError = Viewer | ErrNotAuthorized
+
+type ViewGalleryPayload {
+  gallery: Gallery
+}
+
+union ViewGalleryPayloadOrError = ViewGalleryPayload | ErrAuthenticationFailed
+
+type ViewTokenPayload {
+  token: Token
+}
+
+union ViewTokenPayloadOrError =
+    ViewTokenPayload
+  | ErrAuthenticationFailed
+  | ErrTokenNotFound
+  | ErrCollectionNotFound
+
+type Wallet implements Node {
+  id: ID!
+  dbid: DBID!
+  chainAddress: ChainAddress
+  chain: Chain
+  walletType: WalletType
+  tokens: [Token]
+}
+
+enum WalletType {
+  EOA
+  GnosisSafe
+}
+
+type YouReceivedTopActivityBadgeNotification implements Notification & Node {
+  id: ID!
+  dbid: DBID!
+  seen: Boolean
+  creationTime: Time
+  updatedTime: Time
+  threshold: Int!
+}

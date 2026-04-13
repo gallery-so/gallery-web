@@ -1,0 +1,12 @@
+.animate {
+  position: absolute;
+  will-change: transform;
+}
+
+.hover-listener {
+  perspective: 400px;
+}
+
+.rotatable {
+  transform-style: preserve-3d;
+}

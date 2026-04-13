@@ -1,0 +1,95 @@
+language: 'javascript'
+
+fileGroups:
+  tests:
+    - 'tests/**/*'
+    - '**/*.test.ts*'
+  lint:
+    - '**/*.*{ts,js,tsx,jsx,cjs,mjs}'
+  source:
+    - 'src/**/*.{ts,js,tsx,jsx}'
+
+tasks:
+  relay-watch:
+    command: relay-compiler --watch relay.config.js
+    local: true
+
+  relay-codegen:
+    command: relay-compiler --repersist ../../relay.config.js
+    inputs:
+      - '@group(source)'
+
+  codegen-watch:
+    command: relay-compiler --repersist --watch ../../relay.config.js
+    local: true
+
+  ios-prebuild:
+    command: expo prebuild -p ios
+    local: true
+
+  ios-raw:
+    command: expo run:ios
+    local: true
+
+  ios-device-raw:
+    command: expo run:ios --device
+    local: true
+
+  ios-device:
+    command: noop
+    local: true
+    deps:
+      - '~:ios-device-raw'
+      - '~:relay-watch'
+
+  ios:
+    command: noop
+    local: true
+    deps:
+      - ~:ios-raw
+      - ~:relay-watch
+
+  android-prebuild:
+    command: expo prebuild -p android
+    local: true
+
+  android-physical-device:
+    command: expo start --localhost --android
+    local: true
+
+  android-raw:
+    command: expo run:android
+    local: true
+
+  android-device-raw:
+    command: expo run:android --device
+    local: true
+
+  android-device:
+    command: noop
+    local: true
+    deps:
+      - '~:android-device-raw'
+      - '~:relay-watch'
+
+  android:
+    command: noop
+    local: true
+    deps:
+      - ~:android-raw
+      - ~:relay-watch
+
+  ios-build:
+    command: eas build -p ios --local
+    env:
+      EAS_LOCAL_BUILD_SKIP_CLEANUP: '1'
+    local: true
+
+  # Inherited from root task
+  typecheck:
+    deps:
+      - '~:relay-codegen'
+    command: tsc
+
+  version-bump:
+    command: yarn run version-bump

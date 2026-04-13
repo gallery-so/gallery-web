@@ -1,0 +1,43 @@
+{
+  "extends": ["../../.eslintrc.json"],
+  "plugins": ["react-hooks"],
+  "ignorePatterns": ["ios/", "android/"],
+  "rules": {
+    "no-console": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-native",
+            "importNames": [
+              "TouchableOpacity",
+              "TouchableWithoutFeedback",
+              "RefreshControl",
+              "useColorScheme"
+            ],
+            "message": "Please use the GalleryTouchableOpacity component instead of TouchableOpacity or TouchableWithoutFeedback from 'react-native'.\nPlease use our modified GalleryRefreshControl.\nPlease use useColorScheme from 'nativewind' instead."
+          },
+          {
+            "name": "@gorhom/bottom-sheet",
+            "importNames": ["BottomSheetModal"],
+            "message": "Please use Bar from GalleryBottomSheetModal instead."
+          },
+          {
+            "name": "~/shared/utils/sanity",
+            "message": "Import `fetchSanityContent` from mobile/utils instead"
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["metro.config.js", "tailwind.config.js"],
+      "rules": {
+        // Okay to use require in these files
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    }
+  ]
+}

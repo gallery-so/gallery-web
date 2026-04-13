@@ -1,0 +1,18 @@
+# https://moonrepo.dev/docs/config/global-project
+$schema: 'https://moonrepo.dev/schemas/global-project.json'
+
+tasks:
+  prettier-fix:
+    command: prettier --write --config ../../.prettierrc.json --ignore-path ../../.prettierignore  .
+
+  prettier:
+    command: prettier --check --config ../../.prettierrc.json --ignore-path ../../.prettierignore  .
+
+  lint-fix:
+    command: eslint . --ext .js,.jsx,.ts,.tsx,.cjs,.mjs --fix
+
+  lint:
+    command: eslint . --ext .js,.jsx,.ts,.tsx,.cjs,.mjs
+
+  typecheck:
+    command: tsc --build

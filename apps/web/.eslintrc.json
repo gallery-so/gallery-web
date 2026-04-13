@@ -1,0 +1,33 @@
+{
+  "extends": ["next", "../../.eslintrc.json"],
+  "plugins": ["relay"],
+
+  "overrides": [
+    {
+      "files": ["next.config.js", "jest.config.js", "scripts/**/*"],
+      "rules": {
+        // Okay to use require in these files
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    }
+  ],
+
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "next/link",
+            // "importNames": ["Link"],
+            "message": "Please use the GalleryLink component instead."
+          },
+          {
+            "name": "~/shared/utils/sanity",
+            "message": "Import `fetchSanityContent` from web/utils instead"
+          }
+        ]
+      }
+    ]
+  }
+}

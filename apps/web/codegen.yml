@@ -1,0 +1,25 @@
+schema: ../../schema.graphql
+documents:
+  - ./src/**/*.{ts,tsx}
+  - ../../packages/shared/src/**/*.{ts,tsx}
+generates:
+  ./__generated__/graphql-codegen/enums.ts:
+    config:
+      enumsAsTypes: true
+      onlyEnums: true
+    plugins:
+      - typescript
+  ./tests/__generated__/graphql-codegen/operations.ts:
+    config:
+      scalars:
+        Email: string
+        DBID: string
+        Address: string
+        PubKey: string
+        Time: string
+      avoidOptionals: true
+      autoSelectId: true
+      immutableTypes: true
+    plugins:
+      - typescript
+      - '@gallery-so/typescript-operations'

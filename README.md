@@ -2,6 +2,8 @@
 
 The premier gallery experience for your NFTs.
 
+This repository is a public snapshot of the Gallery web and mobile frontend codebase. It does not include Gallery's former private backend infrastructure, indexing services, or production secrets.
+
 ## Documentation
 
 - [Architecture Overview](docs/ARCHITECTURE.md) — monorepo structure, build system, auth, GraphQL/Relay, feature flags, CI/CD
@@ -82,14 +84,7 @@ Cypress CI is configured as a Github workflow in `.github/workflows`.
 
 ### Advanced
 
-If you need access to any of the following:
-
-- Test wallet
-- Analytics keys
-- Sentry keys
-- Cypress dashboard
-
-Hit up a member of the core team.
+Some workflows and features require third-party credentials that are not included in this repository. Expect to provide your own local environment configuration for auth providers, RPC services, analytics, and error reporting.
 
 ### Feature Flags
 
@@ -113,5 +108,4 @@ Admins (`ADMIN` role) see all features regardless of flag values.
 - `moon run web:typecheck` for checking type validity
 - `moon run web:synpress-run` to run e2e tests
 - `moon run web:synpress-open` to open cypress
-- `yarn fetch-schema` to pull graphql schema from production
-- `yarn fetch-schema-dev` to pull graphql schema from development
+- `yarn fetch-schema` to pull a graphql schema from a locally configured API

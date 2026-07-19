@@ -131,9 +131,7 @@ export default function App() {
           <RelayEnvironmentProvider environment={relayEnvironment}>
             <SWRConfig>
               <Suspense fallback={<LoadingView />}>
-                <PrivyProvider
-                  appId={env.PRIVY_APP_ID}
-                >
+                <PrivyProvider appId={env.PRIVY_APP_ID}>
                   <MobileAnalyticsProvider>
                     <MobileErrorReportingProvider>
                       <GestureHandlerRootView style={{ flex: 1 }}>

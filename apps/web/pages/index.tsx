@@ -1,71 +1,18 @@
-import { Suspense } from 'react';
-import { useFragment, useLazyLoadQuery } from 'react-relay';
-import { graphql } from 'relay-runtime';
+import dynamic from 'next/dynamic';
 
-import { pagesQuery } from '~/generated/pagesQuery.graphql';
-import { pagesRedirectFragment$key } from '~/generated/pagesRedirectFragment.graphql';
-import GalleryRedirect from '~/scenes/_Router/GalleryRedirect';
-import GalleryRoute from '~/scenes/_Router/GalleryRoute';
-import { CmsTypes } from '~/scenes/ContentPages/cms_types';
-import LandingPageScene from '~/scenes/LandingPage/LandingPage';
+import type { CmsTypes } from '~/scenes/ContentPages/cms_types';
 import { fetchSanityContent } from '~/utils/sanity';
 
-type LandingPageSceneWithRedirectProps = {
-  queryRef: pagesRedirectFragment$key;
-  pageContent: CmsTypes.LandingPage;
-};
-
-function LandingPageSceneWithRedirect({
-  queryRef,
-  pageContent,
-}: LandingPageSceneWithRedirectProps) {
-  const query = useFragment(
-    graphql`
-      fragment pagesRedirectFragment on Query {
-        viewer {
-          ... on Viewer {
-            __typename
-          }
-        }
-      }
-    `,
-    queryRef
-  );
-
-  if (query.viewer?.__typename === 'Viewer') {
-    return <GalleryRedirect to={{ pathname: '/latest' }} />;
-  }
-
-  return <LandingPageScene pageContent={pageContent} />;
-}
+const LandingPageRoute = dynamic(() => import('~/scenes/LandingPage/LandingPageRoute'), {
+  ssr: false,
+});
 
 type Props = {
   pageContent: CmsTypes.LandingPage;
 };
 
 export default function Index({ pageContent }: Props) {
-  const query = useLazyLoadQuery<pagesQuery>(
-    graphql`
-      query pagesQuery {
-        ...pagesRedirectFragment
-      }
-    `,
-    {}
-  );
-
-  return (
-    <GalleryRoute
-      element={
-        // The idea here is to show the LandingPageScene when the  LandingPageSceneWithRedirect is loading
-        // Basically just show them something while we're determining whether or not they should be redirected
-        <Suspense fallback={<LandingPageScene pageContent={pageContent} />}>
-          <LandingPageSceneWithRedirect queryRef={query} pageContent={pageContent} />
-        </Suspense>
-      }
-      navbar={false}
-      footerTheme="dark"
-    />
-  );
+  return <LandingPageRoute pageContent={pageContent} />;
 }
 
 const queryString = `*[_type == "landingPage"]{

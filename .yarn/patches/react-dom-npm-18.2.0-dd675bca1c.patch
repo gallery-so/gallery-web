@@ -1,0 +1,29 @@
+diff --git a/package.json b/package.json
+index 1ce1b601dbba54989524424767ea17ea5d01df48..48bbde6bd2e2f390ef066759a9b27ec7b371ac92 100644
+--- a/package.json
++++ b/package.json
+@@ -31,6 +31,7 @@
+     "profiling.js",
+     "server.js",
+     "server.browser.js",
++    "server.edge.js",
+     "server.node.js",
+     "test-utils.js",
+     "cjs/",
+@@ -46,6 +47,7 @@
+       "default": "./server.node.js"
+     },
+     "./server.browser": "./server.browser.js",
++    "./server.edge": "./server.edge.js",
+     "./server.node": "./server.node.js",
+     "./profiling": "./profiling.js",
+     "./test-utils": "./test-utils.js",
+diff --git a/server.edge.js b/server.edge.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..e8798fbcab7952e4f74c2c93a9afc8dd514caf1e
+--- /dev/null
++++ b/server.edge.js
+@@ -0,0 +1,3 @@
++'use strict';
++
++module.exports = require('./server.browser');

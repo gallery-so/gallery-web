@@ -2,18 +2,13 @@ import 'src/scenes/WelcomeAnimation/intro.css';
 import 'src/index.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-import { Analytics } from '@vercel/analytics/react';
+import dynamic from 'next/dynamic';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { ComponentType, FC, PropsWithChildren, useCallback, useEffect, useState } from 'react';
-import { PreloadedQuery } from 'react-relay';
+import type { ComponentType, FC } from 'react';
+import { useEffect } from 'react';
+import type { PreloadedQuery } from 'react-relay';
 
-import GoogleAnalytics from '~/components/GoogleAnalytics';
-import AppProvider from '~/contexts/AppProvider';
-import GlobalLayoutContext from '~/contexts/globalLayout/GlobalLayoutContext';
-import { createRelayEnvironmentFromRecords } from '~/contexts/relay/RelayProvider';
-import { RelayResetContext } from '~/contexts/RelayResetContext';
-import { PreloadQueryFn } from '~/types/PageComponentPreloadQuery';
+import type { PreloadQueryFn } from '~/types/PageComponentPreloadQuery';
 import isProduction from '~/utils/isProduction';
 import welcomeDoormat from '~/utils/welcomeDoormat';
 
@@ -28,106 +23,21 @@ export type MetaTagProps = {
   metaTags?: MetaTag[] | null;
 };
 
-type PageComponent = ComponentType<
+export type PageComponent = ComponentType<
   MetaTagProps & { preloadedQuery?: PreloadedQuery<never> | null }
 > & {
   preloadQuery?: PreloadQueryFn<never>;
 };
 
-// This component ensures that we don't try to render anything on the server.
-// We have a long way to go until we're able to do this w/o compromising
-// on the user's experience.
-function SafeHydrate({ children }: PropsWithChildren) {
-  const [render, setRender] = useState(false);
-
-  useEffect(() => {
-    setRender(true);
-  }, []);
-
-  return <div suppressHydrationWarning>{render ? children : null}</div>;
-}
-
 type PageProps = MetaTagProps & { preloadedQuery: null | PreloadedQuery<never> };
-type AppProps = {
+export type GalleryAppProps = {
   Component: PageComponent;
   pageProps: PageProps;
 };
 
-function Page({ Component, pageProps }: AppProps) {
-  const [relayEnvironment, setRelayEnvironment] = useState(() =>
-    createRelayEnvironmentFromRecords({})
-  );
+const ClientApp = dynamic(() => import('~/components/ClientApp'), { ssr: false });
 
-  const { query } = useRouter();
-
-  const componentPreloadedQuery = Component?.preloadQuery?.({ relayEnvironment, query });
-  const globalLayoutContextPreloadedQuery = GlobalLayoutContext.preloadQuery?.({
-    relayEnvironment,
-    query,
-  });
-
-  if (!globalLayoutContextPreloadedQuery) {
-    throw new Error('Preloaded Queries were not returned from preloadQuery function');
-  }
-
-  const resetRelayEnvironment = useCallback(() => {
-    setRelayEnvironment(createRelayEnvironmentFromRecords({}));
-  }, []);
-
-  const router = useRouter();
-
-  useEffect(
-    // This effect exists to ensure the page gets fully reloaded if we navigate
-    // in or out of the `/base` page.
-    //
-    // This is because we're doing a dumb hack for dark mode and we cannot
-    // have the theme be changed dynamically.
-    function reloadPageWhenNavigatingInAndOutOfBase() {
-      let lastRoute = window.location.pathname;
-      function handleRouteChange(url: string) {
-        if (lastRoute === '/base' || url === '/base') {
-          window.location.href = url;
-        }
-
-        lastRoute = url;
-      }
-
-      router.events.on('routeChangeStart', handleRouteChange);
-
-      return () => router.events.off('routeChangeStart', handleRouteChange);
-    },
-    [router.events]
-  );
-
-  // flip on if we need later
-  const isVercelAnalyticsEnabled = false;
-
-  return (
-    <RelayResetContext.Provider value={resetRelayEnvironment}>
-      <AppProvider
-        relayEnvironment={relayEnvironment}
-        globalLayoutContextPreloadedQuery={globalLayoutContextPreloadedQuery}
-      >
-        <GoogleAnalytics />
-        {isVercelAnalyticsEnabled && <VercelAnalytics />}
-        <Component {...pageProps} preloadedQuery={componentPreloadedQuery} />
-      </AppProvider>
-    </RelayResetContext.Provider>
-  );
-}
-
-function VercelAnalytics() {
-  return (
-    <Analytics
-      beforeSend={(event) => {
-        // Can ignore sending noisy events here
-        return event;
-      }}
-    />
-  );
-}
-
-const App: FC<AppProps> = (props) => {
+const App: FC<GalleryAppProps> = (props) => {
   useEffect(() => {
     if (isProduction()) welcomeDoormat();
   }, []);
@@ -165,9 +75,9 @@ const App: FC<AppProps> = (props) => {
           </>
         )}
       </Head>
-      <SafeHydrate>
-        <Page {...props} />
-      </SafeHydrate>
+      <div suppressHydrationWarning>
+        <ClientApp {...props} />
+      </div>
     </>
   );
 };

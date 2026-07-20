@@ -1,8 +1,11 @@
 const withRoutes = require('nextjs-routes/config')();
 const withBundleAnalyzer = require('@next/bundle-analyzer');
+const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ['shared', 'frames-dls'],
+
   typescript: {
     // Save time in Vercel builds by avoiding a type check.
     // This is fine since we do a type check in Github Actions.
@@ -23,20 +26,11 @@ const nextConfig = {
   },
 
   webpack(config) {
-    // Start https://github.com/NiGhTTraX/ts-monorepo/blob/master/apps/nextjs/next.config.js#L3
-    // Allows us to use typescript from other directories
-    const oneOfRule = config.module.rules.find((rule) => rule.oneOf);
-
-    // Next 12 has multiple TS loaders, and we need to update all of them.
-    const tsRules = oneOfRule.oneOf.filter(
-      (rule) => rule.test && rule.test.toString().includes('tsx|ts')
-    );
-
-    tsRules.forEach((rule) => {
-      // eslint-disable-next-line no-param-reassign
-      rule.include = undefined;
-    });
-    // End https://github.com/NiGhTTraX/ts-monorepo/blob/master/apps/nextjs/next.config.js#L3
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      react: path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+    };
 
     config.module.rules.push({
       test: /\.svg$/,
@@ -75,6 +69,11 @@ const nextConfig = {
 
   async redirects() {
     return [
+      {
+        source: '/home',
+        destination: '/latest',
+        permanent: true,
+      },
       {
         source: '/trending',
         destination: '/home',

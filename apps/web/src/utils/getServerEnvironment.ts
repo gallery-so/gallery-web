@@ -1,8 +1,8 @@
 // the backend environment the frontend is pointing to
 export function getServerEnvironment() {
-  const environment = process.env.NEXT_PUBLIC_VERCEL_ENV;
+  const environment = process.env.NEXT_PUBLIC_DEPLOY_ENV ?? process.env.NEXT_PUBLIC_VERCEL_ENV;
 
-  // if the app is deployed to vercel
+  // if the app is deployed to a managed hosting platform
   if (environment) {
     return environment;
   }

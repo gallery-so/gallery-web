@@ -2,7 +2,7 @@
   "root": true,
   "extends": ["plugin:@typescript-eslint/recommended", "prettier", "plugin:relay/strict"],
   "plugins": ["@typescript-eslint", "simple-import-sort", "relay"],
-  "ignorePatterns": ["*.graphql.ts", "**/operations.ts"],
+  "ignorePatterns": ["*.graphql.ts", "**/operations.ts", "next-env.d.ts"],
 
   "rules": {
     "no-implicit-coercion": "error",

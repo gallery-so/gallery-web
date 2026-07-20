@@ -25,6 +25,11 @@ const worker = {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const url = new URL(request.url);
 
+    if (url.hostname === 'www.gallery.so') {
+      url.hostname = 'gallery.so';
+      return Response.redirect(url.toString(), 308);
+    }
+
     if (url.pathname.startsWith('/glry/')) {
       const upstreamUrl = new URL(`${url.pathname}${url.search}`, API_ORIGIN);
       return fetch(new Request(upstreamUrl, request));

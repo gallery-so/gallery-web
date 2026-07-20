@@ -1,5 +1,6 @@
 const withRoutes = require('nextjs-routes/config')();
 const withBundleAnalyzer = require('@next/bundle-analyzer');
+const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -25,6 +26,12 @@ const nextConfig = {
   },
 
   webpack(config) {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      react: path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+    };
+
     config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack'],
@@ -62,6 +69,11 @@ const nextConfig = {
 
   async redirects() {
     return [
+      {
+        source: '/home',
+        destination: '/latest',
+        permanent: true,
+      },
       {
         source: '/trending',
         destination: '/home',

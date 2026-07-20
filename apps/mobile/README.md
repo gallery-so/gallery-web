@@ -6,7 +6,7 @@ React Native app built with Expo (SDK 50), Relay, and Hermes.
 
 | Tool      | Version | Notes                                                                                     |
 | --------- | ------- | ----------------------------------------------------------------------------------------- |
-| Node.js   | 20.5.0  | See `.nvmrc` in repo root                                                                 |
+| Node.js   | 22.23.1 | See `.nvmrc` in repo root                                                                 |
 | Yarn      | 3.4.1   | Bundled via `.yarn/releases/`                                                             |
 | Xcode     | 16.4    | Download from [Apple Developer](https://developer.apple.com/download/all/?q=Xcode%2016.4) |
 | CocoaPods | latest  | `gem install cocoapods`                                                                   |

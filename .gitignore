@@ -36,6 +36,8 @@ persisted_queries.json
 dts/
 # Build cache manifests
 *.tsbuildinfo
+.open-next
+.wrangler
 
 # env config
 .env

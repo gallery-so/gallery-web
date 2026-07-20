@@ -17,6 +17,13 @@ module.exports = async () => {
     modulePaths: ['<rootDir>'],
 
     moduleNameMapper: {
+      // Monorepo dependencies otherwise resolve a second physical React copy from the repository
+      // root, which breaks hooks. Keep Jest on the same React instance as the web app.
+      '^react$': '<rootDir>/node_modules/react',
+      '^react/(.*)$': '<rootDir>/node_modules/react/$1',
+      '^react-dom$': '<rootDir>/node_modules/react-dom',
+      '^react-dom/(.*)$': '<rootDir>/node_modules/react-dom/$1',
+
       // Ensure all ouf our aliases from tsconfig work in jext
       ...pathsToModuleNameMapper(paths, { prefix: '<rootDir>/' }),
 

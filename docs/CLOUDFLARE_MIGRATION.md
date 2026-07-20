@@ -9,6 +9,8 @@ existing API, CDN, analytics, email, and other non-frontend DNS services.
 
 - The web app is upgraded to Next.js 15 and builds with OpenNext for Cloudflare Workers.
 - The Worker runtime passes local SSR, redirect, and immutable-static-cache smoke tests.
+- Public subrequests are forced through Cloudflare's public routing path so SSR can reach the
+  existing Cloudflare-routed `api.gallery.so` backend without Worker-to-Worker recursion.
 - Production-mode smoke tests pass for `/`, `/robin`, and `/maintenance` against the live API.
 - The app accepts deployment-neutral environment variables while retaining Vercel fallbacks.
 - The production API, analytics proxy, Sanity project, Privy application, and public analytics

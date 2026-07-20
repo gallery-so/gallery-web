@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "bash -c \"node scripts/clean-next-build.mjs && yarn relay-compiler --repersist --project web ../../relay.config.js && yarn graphql-codegen && yarn next build\"",
-    "cf:build": "opennextjs-cloudflare build",
+    "cf:build": "node scripts/clean-cloudflare-build.mjs && opennextjs-cloudflare build",
     "cf:deploy": "opennextjs-cloudflare deploy",
     "cf:upload": "opennextjs-cloudflare upload",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview"

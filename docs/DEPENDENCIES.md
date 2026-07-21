@@ -21,7 +21,6 @@ Key external services and libraries that require ongoing subscriptions, API keys
 | Service | Web Package | Mobile Package | Requires API Key | Key Location |
 |---------|-------------|----------------|------------------|--------------|
 | **Mixpanel** | `mixpanel-browser@^2.41.0` | `mixpanel-react-native@^3.0.0-beta.2` | Yes (Token) | `NEXT_PUBLIC_MIXPANEL_TOKEN` |
-| **Vercel Analytics** | `@vercel/analytics@^0.1.1` | N/A | No (auto-configured on Vercel) | N/A |
 
 **Notes:**
 - Mixpanel mobile SDK is on a beta version

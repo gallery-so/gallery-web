@@ -1,15 +1,15 @@
 export function getBaseUrl(): string {
-  const environment = process.env.NEXT_PUBLIC_DEPLOY_ENV ?? process.env.NEXT_PUBLIC_VERCEL_ENV;
+  const environment = process.env.NEXT_PUBLIC_DEPLOY_ENV;
 
   if (environment === 'production') {
     return 'https://gallery.so';
-  } else if (environment === 'development') {
-    return `https://gallery-dev.vercel.app`;
-  } else if (environment === 'preview') {
-    const deploymentUrl = process.env.NEXT_PUBLIC_DEPLOY_URL ?? process.env.NEXT_PUBLIC_VERCEL_URL;
+  }
+
+  if (environment === 'development' || environment === 'preview') {
+    const deploymentUrl = process.env.NEXT_PUBLIC_DEPLOY_URL;
 
     if (deploymentUrl) {
-      return `https://${deploymentUrl}`;
+      return deploymentUrl.startsWith('http') ? deploymentUrl : `https://${deploymentUrl}`;
     }
   }
 

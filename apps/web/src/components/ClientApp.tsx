@@ -1,4 +1,3 @@
-import { Analytics } from '@vercel/analytics/react';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -50,8 +49,6 @@ export default function ClientApp({ Component, pageProps }: GalleryAppProps) {
     [router.events]
   );
 
-  const isVercelAnalyticsEnabled = false;
-
   return (
     <RelayResetContext.Provider value={resetRelayEnvironment}>
       <AppProvider
@@ -59,13 +56,6 @@ export default function ClientApp({ Component, pageProps }: GalleryAppProps) {
         globalLayoutContextPreloadedQuery={globalLayoutContextPreloadedQuery}
       >
         <GoogleAnalytics />
-        {isVercelAnalyticsEnabled && (
-          <Analytics
-            beforeSend={(event) => {
-              return event;
-            }}
-          />
-        )}
         <Component {...pageProps} preloadedQuery={componentPreloadedQuery} />
       </AppProvider>
     </RelayResetContext.Provider>

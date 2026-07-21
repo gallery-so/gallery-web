@@ -23,7 +23,8 @@ existing API, CDN, analytics, email, and other non-frontend DNS services.
   1.11 MB to 90.5 kB, and keeps dynamic routes within the Worker CPU budget.
 - Dynamic HTML is never retained by the edge between deployments; versioned JavaScript, CSS, and
   image assets keep their immutable cache policy.
-- The app accepts deployment-neutral environment variables while retaining Vercel fallbacks.
+- The app uses deployment-neutral environment variables and no longer contains Vercel runtime
+  fallbacks.
 - The production API, analytics proxy, Sanity project, Privy application, and public analytics
   configuration were verified against the currently deployed web bundle.
 - The GitHub repository is connected to the Cloudflare Worker. Pushes to `main` build and deploy
@@ -32,15 +33,16 @@ existing API, CDN, analytics, email, and other non-frontend DNS services.
 - The final `main` build (`e1b5649`) completed successfully in Cloudflare, including dependency
   cache upload. The isolated Worker serves the landing page and the live API-backed `/robin`
   profile correctly.
-- The inactive Cloudflare zone contains 41 audited records: 39 DNS-only records preserving the
+- The active Cloudflare zone contains the audited DNS records preserving the
   existing email and service hostnames, plus Worker custom-domain records for `gallery.so` and
-  `www.gallery.so`. The staged set was compared record-by-record with the live Vercel-hosted zone.
+  `www.gallery.so`. The set was compared record-by-record with the former Vercel-hosted zone.
 - The apex is configured to serve the Worker. `www.gallery.so` is configured to return a permanent
   redirect to the apex while preserving the path and query string, matching the existing public
   behavior.
-- Production traffic is still served by Vercel because the registrar continues to delegate to
-  `ns1.vercel-dns.com` and `ns2.vercel-dns.com`. The only remaining cutover action is to replace
-  those at Namecheap with `arya.ns.cloudflare.com` and `josh.ns.cloudflare.com`.
+- Namecheap delegates `gallery.so` to `arya.ns.cloudflare.com` and `josh.ns.cloudflare.com`.
+  Public resolvers, TLS, the apex Worker, and the path-preserving `www` redirect are live.
+- Dynamic social previews run on the dedicated `gallery-opengraph` Cloudflare Worker at
+  `https://og.gallery.so`; the web app no longer references the Vercel OpenGraph deployment.
 - React Doctor reports no diagnostics in the migration's changed source files. The repository's
   older full-codebase diagnostics are pre-existing and outside this infrastructure migration.
 - Cloudflare CLI authorization and an isolated Worker deployment under the `rokim8@gmail.com`
@@ -53,15 +55,27 @@ existing API, CDN, analytics, email, and other non-frontend DNS services.
 3. [x] Export and reproduce every current DNS record in Cloudflare.
 4. [x] Bind `gallery.so` and `www.gallery.so` to the Worker without changing `api`, `cdn`,
        `analytics`, mail, verification, or other service records.
-5. [ ] At Namecheap, switch authoritative nameservers to `arya.ns.cloudflare.com` and
+5. [x] At Namecheap, switch authoritative nameservers to `arya.ns.cloudflare.com` and
        `josh.ns.cloudflare.com`.
-6. [ ] Confirm public resolvers return the two Cloudflare nameservers and the Cloudflare zone is
+6. [x] Confirm public resolvers return the two Cloudflare nameservers and the Cloudflare zone is
        active.
-7. [ ] Run the production checks below and keep the Vercel project intact for rollback.
+7. [x] Run the production checks below and keep the Vercel project intact for the observation
+       window only.
+
+## Vercel retirement
+
+- The production frontend and OpenGraph paths are served by Cloudflare.
+- `frame-tagger`, `moshicam-sticker-viewer`, and `moshi-frame-server` have no observed production
+  traffic and are retirement candidates rather than migration targets.
+- Keep the Vercel `gallery` and `opengraph` deployments available only through the observation
+  window that began on July 20, 2026. Then confirm their request logs are quiet, remove the Gallery
+  domains from Vercel, and delete the obsolete projects.
+- Do not remove the unrelated `moshi.cam` domain or any Moshicam infrastructure while retiring
+  Gallery's Vercel projects.
 
 ## Production verification
 
-After the nameserver change has propagated:
+After any production deployment:
 
 1. Confirm `gallery.so` returns HTTP 200 from Cloudflare.
 2. Confirm `www.gallery.so/<path>?<query>` returns HTTP 308 to
@@ -78,8 +92,8 @@ After the nameserver change has propagated:
 
 ## Observation window
 
-- Retain the Vercel project and domain configuration unchanged for at least seven days after the
-  cutover.
+- Retain the Vercel project and domain configuration unchanged through July 27, 2026 (seven days
+  after the cutover).
 - Check the main site and a real profile after cutover, again after roughly one hour, and daily
   during the observation window.
 - Do not remove Vercel until Cloudflare request/error telemetry and the preserved DNS services

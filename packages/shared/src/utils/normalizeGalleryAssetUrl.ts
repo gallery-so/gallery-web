@@ -21,7 +21,12 @@ export function normalizeGalleryAssetUrl(url: string | null): string | null {
     return url;
   }
 
-  const [, bucket, objectPath] = match;
+  const bucket = match[1];
+  const objectPath = match[2];
+  if (!bucket || !objectPath) {
+    return url;
+  }
+
   const cdnPrefix = GCS_BUCKET_TO_CDN_PREFIX[bucket];
   if (!cdnPrefix) {
     return url;

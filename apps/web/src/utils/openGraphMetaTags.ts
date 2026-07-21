@@ -3,8 +3,6 @@ import { removeNullValues } from 'shared/relay/removeNullValues';
 import { HEIGHT_OPENGRAPH_IMAGE, WIDTH_OPENGRAPH_IMAGE } from '~/constants/opengraph';
 import { MetaTagProps } from '~/pages/_app';
 
-import isProduction from './isProduction';
-
 type Params = {
   title: string;
   path: string;
@@ -12,7 +10,7 @@ type Params = {
   buttonContent?: string;
 };
 
-const baseurl = `https://gallery-opengraph${isProduction() ? '' : '-preview'}.vercel.app/api/og`;
+const baseurl = 'https://og.gallery.so/api/og';
 
 export const openGraphMetaTags = ({
   title,

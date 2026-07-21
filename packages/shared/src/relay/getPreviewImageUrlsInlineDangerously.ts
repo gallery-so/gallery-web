@@ -3,6 +3,7 @@ import { graphql, readInlineData } from 'relay-runtime';
 import { getPreviewImageUrlsInlineDangerouslyFragment$key } from '~/generated/getPreviewImageUrlsInlineDangerouslyFragment.graphql';
 
 import { CouldNotRenderNftError } from '../errors/CouldNotRenderNftError';
+import { normalizeGalleryAssetUrl } from '../utils/normalizeGalleryAssetUrl';
 
 type UrlSet = {
   small: string | null;
@@ -29,6 +30,14 @@ type Props = {
   tokenRef: getPreviewImageUrlsInlineDangerouslyFragment$key;
   preferStillFrameFromGif?: boolean;
 };
+
+function normalizePreviewUrls(urls: UrlSet): UrlSet {
+  return {
+    small: normalizeGalleryAssetUrl(urls.small),
+    medium: normalizeGalleryAssetUrl(urls.medium),
+    large: normalizeGalleryAssetUrl(urls.large),
+  };
+}
 
 /**
  * NOTE: this function should rarely be used directly as it won't report errors,
@@ -254,17 +263,17 @@ export function getPreviewImageUrlsInlineDangerously({
     if (media.staticPreviewURLs) {
       return {
         type: 'valid',
-        urls: {
+        urls: normalizePreviewUrls({
           small: media.staticPreviewURLs.small,
           medium: media.staticPreviewURLs.medium,
           large: media.staticPreviewURLs.large,
-        },
+        }),
       };
     }
   }
 
   return {
     type: 'valid',
-    urls: previewUrls,
+    urls: normalizePreviewUrls(previewUrls),
   };
 }

@@ -10,6 +10,7 @@ import { NftDetailVideoFragment$key } from '~/generated/NftDetailVideoFragment.g
 import { useContainedDimensionsForToken } from '~/hooks/useContainedDimensionsForToken';
 import { useThrowOnMediaFailure } from '~/hooks/useNftRetry';
 import { useIsDesktopWindowWidth } from '~/hooks/useWindowSize';
+import { normalizeGalleryAssetUrl } from '~/shared/utils/normalizeGalleryAssetUrl';
 import isVideoUrl from '~/utils/isVideoUrl';
 
 type Props = {
@@ -51,11 +52,12 @@ function NftDetailVideo({ mediaRef, hideControls = false, onLoad, tokenId }: Pro
       return undefined;
     }
 
-    if (isVideoUrl(token.previewURLs.large)) {
+    const normalizedPreviewUrl = normalizeGalleryAssetUrl(token.previewURLs.large);
+    if (!normalizedPreviewUrl || isVideoUrl(normalizedPreviewUrl)) {
       return undefined;
     }
 
-    return token.previewURLs.large;
+    return normalizedPreviewUrl;
   }, [token?.previewURLs?.large]);
 
   const resultDimensions = useContainedDimensionsForToken({
@@ -91,7 +93,7 @@ function NftDetailVideo({ mediaRef, hideControls = false, onLoad, tokenId }: Pro
 
   return (
     <StyledVideo
-      src={`${token.contentRenderURLs.large}#t=0.001`}
+      src={`${normalizeGalleryAssetUrl(token.contentRenderURLs.large)}#t=0.001`}
       muted
       autoPlay
       playsInline

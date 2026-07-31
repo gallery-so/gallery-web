@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { ContentIsLoadedEvent } from '~/contexts/shimmer/ShimmerContext';
 import { NftDetailModelFragment$key } from '~/generated/NftDetailModelFragment.graphql';
 import { useThrowOnMediaFailure } from '~/hooks/useNftRetry';
+import { normalizeGalleryAssetUrl } from '~/shared/utils/normalizeGalleryAssetUrl';
 
 // TODO: Clean this up once fixed
 // https://github.com/google/model-viewer/issues/1502
@@ -54,7 +55,7 @@ function NftDetailModel({ mediaRef, onLoad, fullHeight }: Props) {
         auto-rotate
         camera-controls
         interaction-prompt={false}
-        src={contentRenderURL}
+        src={normalizeGalleryAssetUrl(contentRenderURL) ?? ''}
         style={{
           width: '100%',
           height: fullHeight ? '100%' : undefined,
@@ -86,7 +87,7 @@ export function RawNftDetailModel({
         auto-rotate
         camera-controls
         interaction-prompt={false}
-        src={url}
+        src={normalizeGalleryAssetUrl(url) ?? ''}
         style={{
           width: '100%',
           height: fullHeight ? '100%' : undefined,

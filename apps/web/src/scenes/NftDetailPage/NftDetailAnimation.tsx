@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import { ContentIsLoadedEvent } from '~/contexts/shimmer/ShimmerContext';
 import { NftDetailAnimationFragment$key } from '~/generated/NftDetailAnimationFragment.graphql';
+import { normalizeGalleryAssetUrl } from '~/shared/utils/normalizeGalleryAssetUrl';
 
 import { RawNftDetailModel } from './NftDetailModel';
 import processIFrameRenderUrl from './processIFrameRenderUrl';
@@ -44,7 +45,7 @@ function NftDetailAnimation({ mediaRef, onLoad }: Props) {
       token.definition.media.__typename === 'HtmlMedia' ||
       token.definition.media.__typename === 'UnknownMedia'
     ) {
-      return token.definition.media.contentRenderURL;
+      return normalizeGalleryAssetUrl(token.definition.media.contentRenderURL) ?? '';
     } else if (token.definition.media.__typename === 'TextMedia') {
       if (token.definition.media.mediaURL?.startsWith('data:')) {
         const mimeType = token.definition.media.mediaURL.split('data:')[1]?.split(';')[0];

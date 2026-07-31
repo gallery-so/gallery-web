@@ -8,6 +8,7 @@ import { NftDetailGifFragment$key } from '~/generated/NftDetailGifFragment.graph
 import { useBreakpoint } from '~/hooks/useWindowSize';
 import { CouldNotRenderNftError } from '~/shared/errors/CouldNotRenderNftError';
 import { noop } from '~/shared/utils/noop';
+import { normalizeGalleryAssetUrl } from '~/shared/utils/normalizeGalleryAssetUrl';
 import { graphqlGetResizedNftImageUrlWithFallback } from '~/utils/token';
 
 type Props = {
@@ -37,7 +38,7 @@ function NftDetailGif({ tokenRef, onClick = noop, onLoad }: Props) {
 
   const contentRenderURL = useMemo(() => {
     if (token.definition.media.__typename === 'GIFMedia') {
-      return token.definition.media.contentRenderURL;
+      return normalizeGalleryAssetUrl(token.definition.media.contentRenderURL) ?? '';
     }
 
     return '';

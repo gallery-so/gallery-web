@@ -16,6 +16,7 @@ import { useBreakpoint, useIsMobileWindowWidth } from '~/hooks/useWindowSize';
 import ExpandIcon from '~/icons/ExpandIcon';
 import { CouldNotRenderNftError } from '~/shared/errors/CouldNotRenderNftError';
 import { ReportingErrorBoundary } from '~/shared/errors/ReportingErrorBoundary';
+import { normalizeGalleryAssetUrl } from '~/shared/utils/normalizeGalleryAssetUrl';
 import { getBackgroundColorOverrideForContract } from '~/utils/token';
 
 import NftDetailAnimation from './NftDetailAnimation';
@@ -65,7 +66,9 @@ export function NftDetailAssetComponent({
         <NftDetailImage
           alt={null}
           onLoad={onLoad}
-          imageUrl={token.definition.media?.fallbackMedia?.mediaURL}
+          imageUrl={normalizeGalleryAssetUrl(
+            token.definition.media?.fallbackMedia?.mediaURL ?? null
+          )}
         />
       }
     >
@@ -151,8 +154,9 @@ function NftDetailAssetComponentWithouFallback({
       return <NftDetailAudio onLoad={onLoad} tokenRef={token} />;
     case 'ImageMedia':
       const imageMedia = token.definition.media;
+      const imageUrl = normalizeGalleryAssetUrl(imageMedia.contentRenderURL);
 
-      if (!imageMedia.contentRenderURL) {
+      if (!imageUrl) {
         throw new CouldNotRenderNftError(
           'NftDetailAsset',
           'Token media type was `ImageMedia` but contentRenderURL was null'
@@ -163,20 +167,19 @@ function NftDetailAssetComponentWithouFallback({
         <NftDetailImage
           alt={token.definition.name}
           onLoad={onLoad}
-          imageUrl={imageMedia.contentRenderURL}
+          imageUrl={imageUrl}
           onClick={() => {
             if (toggleLightbox) {
               toggleLightbox();
               return;
             }
-            if (imageMedia.contentRenderURL) {
-              window.open(imageMedia.contentRenderURL);
-            }
+            window.open(imageUrl, '_blank', 'noopener,noreferrer');
           }}
         />
       );
     case 'GIFMedia':
       const gifMedia = token.definition.media;
+      const gifUrl = normalizeGalleryAssetUrl(gifMedia.contentRenderURL);
 
       return (
         <NftDetailGif
@@ -187,8 +190,8 @@ function NftDetailAssetComponentWithouFallback({
               toggleLightbox();
               return;
             }
-            if (gifMedia.contentRenderURL) {
-              window.open(gifMedia.contentRenderURL);
+            if (gifUrl) {
+              window.open(gifUrl, '_blank', 'noopener,noreferrer');
             }
           }}
         />

@@ -48,6 +48,27 @@ function expectVisibleOpenGraphPng(body: Buffer) {
   expect(visibleColors.size).toBeGreaterThan(1);
 }
 
+function expectProfileArtworkPng(body: Buffer) {
+  const png = PNG.sync.read(body as unknown as Parameters<typeof PNG.sync.read>[0]);
+  let colorfulPixels = 0;
+
+  for (let y = 150; y < 450; y++) {
+    for (let x = 50; x < 1_150; x++) {
+      const index = (y * png.width + x) * 4;
+      const red = png.data[index];
+      const green = png.data[index + 1];
+      const blue = png.data[index + 2];
+      const colorSpread = Math.max(red, green, blue) - Math.min(red, green, blue);
+
+      if (png.data[index + 3] > 0 && colorSpread > 25) {
+        colorfulPixels++;
+      }
+    }
+  }
+
+  expect(colorfulPixels).toBeGreaterThan(10_000);
+}
+
 describe('Cloudflare Worker integration', () => {
   it.each([
     ['fallback logo', '/media/system/opengraph/gallery-full-logo.png', 'image/png'],
@@ -88,6 +109,12 @@ describe('Cloudflare Worker integration', () => {
     ]);
 
     expect(realProfile.toString('base64')).not.toBe(missingProfile.toString('base64'));
+  });
+
+  it('renders gallery artwork in a profile preview', async () => {
+    const { body } = await fetchBinary(REAL_PROFILE_PATH);
+
+    expectProfileArtworkPng(body);
   });
 
   it('serializes overlapping profile renders without degrading them', async () => {

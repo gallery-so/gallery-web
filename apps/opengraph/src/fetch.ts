@@ -1,3 +1,26 @@
+const GALLERY_CDN_ORIGIN = 'https://cdn.gallery.so';
+
+const GCS_BUCKET_TO_CDN_PREFIX: Record<string, string> = {
+  'token-media': 'media',
+  'gallery-prod-token-media': 'media',
+  'token-content': 'content',
+  'gallery-prod-token-content': 'content',
+};
+
+function normalizeGalleryAssetUrl(url: string | null) {
+  if (!url) return url;
+
+  const match = url.match(/^https:\/\/storage\.googleapis\.com\/([^/]+)\/(.+)$/);
+  if (!match) return url;
+
+  const bucket = match[1];
+  const objectPath = match[2];
+  if (!bucket || !objectPath) return url;
+
+  const cdnPrefix = GCS_BUCKET_TO_CDN_PREFIX[bucket];
+  return cdnPrefix ? `${GALLERY_CDN_ORIGIN}/${cdnPrefix}/${objectPath}` : url;
+}
+
 export const fetchGraphql = async ({
   queryText,
   variables,
@@ -59,7 +82,10 @@ export const getReachableImageUrls = async (
   urls: Array<string | null | undefined>,
   limit: number
 ) => {
-  const candidates = urls.filter((url): url is string => Boolean(url)).slice(0, limit * 3);
+  const candidates = urls
+    .map((url) => normalizeGalleryAssetUrl(url ?? null))
+    .filter((url): url is string => Boolean(url))
+    .slice(0, limit * 3);
   const checkedUrls = await Promise.all(
     candidates.map(async (url) => {
       try {

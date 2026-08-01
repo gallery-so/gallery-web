@@ -8,6 +8,7 @@ High-level overview of the Gallery frontend codebase.
 gallery-frontend/
 ├── apps/
 │   ├── web/          # Next.js + Relay (gallery.so)
+│   ├── opengraph/    # Next.js + OpenNext Worker (og.gallery.so)
 │   └── mobile/       # React Native/Expo + Relay (iOS & Android)
 ├── packages/
 │   ├── shared/       # Shared code (hooks, utils, Relay fragments)
@@ -25,18 +26,20 @@ gallery-frontend/
 
 ### Common Commands
 
-| Command | Description |
-|---------|-------------|
-| `moon run web:dev` | Start web app (http://localhost:3000) |
-| `moon run mobile:ios` | Start iOS simulator |
-| `moon run mobile:android` | Start Android emulator |
-| `moon run web:relay-watch` | Relay compiler in watch mode |
+| Command                         | Description                                      |
+| ------------------------------- | ------------------------------------------------ |
+| `moon run web:dev`              | Start web app (http://localhost:3000)            |
+| `moon run mobile:ios`           | Start iOS simulator                              |
+| `moon run mobile:android`       | Start Android emulator                           |
+| `moon run web:relay-watch`      | Relay compiler in watch mode                     |
 | `moon run shared:codegen-watch` | Shared package codegen (run as separate process) |
-| `moon run web:test` | Run web unit tests |
-| `moon run web:lint` | Lint web |
-| `moon run web:typecheck` | Type-check web |
-| `yarn fetch-schema` | Pull GraphQL schema from production |
-| `yarn fetch-schema-dev` | Pull GraphQL schema from development |
+| `moon run web:test`             | Run web unit tests                               |
+| `moon run web:lint`             | Lint web                                         |
+| `moon run web:typecheck`        | Type-check web                                   |
+| `moon run opengraph:cf-build`   | Build the OpenGraph Cloudflare Worker            |
+| `moon run opengraph:test`       | Test OpenGraph against a running local Worker    |
+| `yarn fetch-schema`             | Pull GraphQL schema from production              |
+| `yarn fetch-schema-dev`         | Pull GraphQL schema from development             |
 
 ### Build Order
 
@@ -62,11 +65,11 @@ Defined in `.moon/tasks.yml`, available to all workspaces:
 
 **Relay compiler:** Configured in `relay.config.js` with three projects:
 
-| Project | Source | Output | APQ |
-|---------|--------|--------|-----|
-| web | `apps/web` | `apps/web/__generated__/relay/` | Enabled (SHA256) |
-| mobile | `apps/mobile` | `apps/mobile/__generated__/relay/` | Disabled |
-| shared | `packages/shared` | `packages/shared/__generated__/relay/` | N/A |
+| Project | Source            | Output                                 | APQ              |
+| ------- | ----------------- | -------------------------------------- | ---------------- |
+| web     | `apps/web`        | `apps/web/__generated__/relay/`        | Enabled (SHA256) |
+| mobile  | `apps/mobile`     | `apps/mobile/__generated__/relay/`     | Disabled         |
+| shared  | `packages/shared` | `packages/shared/__generated__/relay/` | N/A              |
 
 The shared package fragments are available to both web and mobile projects.
 
@@ -82,16 +85,17 @@ npx relay-compiler --project web relay.config.js
 
 The app supports multiple auth methods via [Privy](https://www.privy.io/):
 
-| Method | Web Package | Mobile Package |
-|--------|-------------|----------------|
-| Email (2FA) | `@privy-io/react-auth` | `@privy-io/expo` |
-| Magic Link | `magic-sdk` | `@magic-sdk/react-native-expo` |
-| WalletConnect | `@walletconnect/*` | `@walletconnect/modal-react-native` |
-| Farcaster | `@farcaster/auth-kit` | `@farcaster/auth-kit` |
-| Coinbase Wallet | via RainbowKit | `@coinbase/wallet-mobile-sdk` |
-| EOA Wallets | `@rainbow-me/rainbowkit` | Native wallet connectors |
+| Method          | Web Package              | Mobile Package                      |
+| --------------- | ------------------------ | ----------------------------------- |
+| Email (2FA)     | `@privy-io/react-auth`   | `@privy-io/expo`                    |
+| Magic Link      | `magic-sdk`              | `@magic-sdk/react-native-expo`      |
+| WalletConnect   | `@walletconnect/*`       | `@walletconnect/modal-react-native` |
+| Farcaster       | `@farcaster/auth-kit`    | `@farcaster/auth-kit`               |
+| Coinbase Wallet | via RainbowKit           | `@coinbase/wallet-mobile-sdk`       |
+| EOA Wallets     | `@rainbow-me/rainbowkit` | Native wallet connectors            |
 
 **Blockchain libraries:**
+
 - Web uses `ethers@5.x` and `viem@2.x`
 - Mobile uses `ethers@6.x` and `viem@1.x`
 - Tezos support via `@taquito/taquito` (web only)
@@ -116,6 +120,7 @@ export const STATIC_FEATURE_FLAGS = {
 ### Relay-Based Flags (authenticated contexts)
 
 Locations:
+
 - Web: `apps/web/src/utils/graphql/isFeatureEnabled.tsx`
 - Mobile: `apps/mobile/src/utils/isFeatureEnabled.tsx`
 
@@ -149,15 +154,16 @@ See `apps/mobile/README.md` for full setup instructions including Xcode 16.4 req
 
 GitHub Actions workflows in `.github/workflows/`:
 
-| Workflow | File | Trigger | Description |
-|----------|------|---------|-------------|
-| Web E2E | `web.e2e.yml` | PR | Cypress E2E tests via Docker |
-| Web Unit | `web.unit.yml` | PR | Jest unit tests |
-| Repo Lint | `repo-lint.yml` | PR | ESLint across all workspaces |
-| Repo Typecheck | `repo-typecheck.yml` | PR | TypeScript type-checking |
-| Mobile Build | `mobile-build.yml` | Manual/PR | EAS Build for iOS and Android |
-| Mobile Release | `mobile-release.yml` | Manual | EAS Submit to app stores |
-| Bundle Diff | `web.bundle-diff.yml` | PR | Bundle size comparison |
-| Screenshots | `web.screenshots.yml` | PR | Visual regression screenshots |
-| Link Artifacts | `web.link-artifacts.yml` | PR | Link build artifacts to PRs |
-| Labeler | `labeler.yml` | PR | Auto-label PRs by file paths |
+| Workflow       | File                     | Trigger                 | Description                           |
+| -------------- | ------------------------ | ----------------------- | ------------------------------------- |
+| Web E2E        | `web.e2e.yml`            | PR                      | Cypress E2E tests via Docker          |
+| Web Unit       | `web.unit.yml`           | PR                      | Jest unit tests                       |
+| OpenGraph      | `opengraph.yml`          | Push touching OpenGraph | Worker build and renderer smoke tests |
+| Repo Lint      | `repo-lint.yml`          | PR                      | ESLint across all workspaces          |
+| Repo Typecheck | `repo-typecheck.yml`     | PR                      | TypeScript type-checking              |
+| Mobile Build   | `mobile-build.yml`       | Manual/PR               | EAS Build for iOS and Android         |
+| Mobile Release | `mobile-release.yml`     | Manual                  | EAS Submit to app stores              |
+| Bundle Diff    | `web.bundle-diff.yml`    | PR                      | Bundle size comparison                |
+| Screenshots    | `web.screenshots.yml`    | PR                      | Visual regression screenshots         |
+| Link Artifacts | `web.link-artifacts.yml` | PR                      | Link build artifacts to PRs           |
+| Labeler        | `labeler.yml`            | PR                      | Auto-label PRs by file paths          |

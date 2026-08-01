@@ -16,7 +16,7 @@ projects:
   frames: 'packages/frames-dls'
   web: 'apps/web'
   mobile: 'apps/mobile'
-
+  opengraph: 'apps/opengraph'
 
 # Configures the version control system to utilize within the workspace. A VCS
 # is required for determining touched (added, modified, etc) files, calculating file hashes,

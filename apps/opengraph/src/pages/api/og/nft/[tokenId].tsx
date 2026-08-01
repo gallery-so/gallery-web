@@ -1,0 +1,174 @@
+/* eslint-disable @next/next/no-img-element */
+import { ImageResponse } from '../../../../utils/imageResponse';
+import { fetchGraphql, getPreviewUrl } from '../../../../fetch';
+import { tokenIdOpengraphQuery } from '../../../../queries/tokenIdOpengraphQuery';
+import { NextApiRequest } from 'next';
+import {
+  CHAR_LENGTH_TWO_LINE,
+  truncateAndStripMarkdown,
+} from '../../../../utils/extractWordsWithinLimit';
+import {
+  WIDTH_OPENGRAPH_IMAGE,
+  HEIGHT_OPENGRAPH_IMAGE,
+  fallbackImageResponse,
+} from '../../../../utils/fallback';
+import { ABCDiatypeRegular, alpinaLight, alpinaLightItalic } from '../../../../utils/fonts';
+import React from 'react';
+import { getQueryParam } from '../../../../utils/request';
+import { toNextApiHandler } from '../../../../utils/nextApiResponse';
+
+const handler = async (req: NextApiRequest) => {
+  try {
+    const tokenId = getQueryParam(req, 'tokenId');
+
+    if (!tokenId || typeof tokenId !== 'string') {
+      return fallbackImageResponse();
+    }
+
+    const queryResponse = await fetchGraphql({
+      queryText: tokenIdOpengraphQuery,
+      variables: { tokenId: tokenId },
+    });
+
+    const { token } = queryResponse.data;
+    if (token?.__typename !== 'Token') {
+      return fallbackImageResponse();
+    }
+
+    const tokenImageUrl = getPreviewUrl(token.definition.media);
+    const title = token.definition.name;
+    const collectorsNoteText = truncateAndStripMarkdown(token.collectorsNote);
+    const description = truncateAndStripMarkdown(
+      token.definition.description,
+      CHAR_LENGTH_TWO_LINE
+    );
+
+    const ABCDiatypeRegularFontData = await ABCDiatypeRegular(req);
+    const alpinaLightFontData = await alpinaLight(req);
+    const alpinaLightItalicFontData = await alpinaLightItalic(req);
+
+    return ImageResponse.create(
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+          minHeight: 200,
+          backgroundColor: '#ffffff',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 44,
+            height: '100%',
+          }}
+        >
+          <img
+            src={tokenImageUrl}
+            width={330}
+            height={265}
+            style={{
+              maxWidth: '330px',
+              height: '265px',
+              display: 'block',
+              objectFit: 'contain',
+            }}
+            alt="post"
+          />
+          {collectorsNoteText && (
+            <div style={{ display: 'flex', maxWidth: 440 }}>
+              <p
+                style={{
+                  fontFamily: "'GT Alpina Italic'",
+                  fontSize: '24px',
+                  fontWeight: 400,
+                  lineHeight: '24px',
+                  margin: 0,
+                }}
+              >
+                “{collectorsNoteText}”
+              </p>
+            </div>
+          )}
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            position: 'absolute',
+            bottom: '24px',
+            left: '24px',
+            marginRight: 25,
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "'GT Alpina'",
+              fontSize: '32px',
+              fontWeight: 400,
+              lineHeight: '36px',
+              letterSpacing: '0px',
+              margin: 0,
+            }}
+          >
+            {title}
+          </p>
+          {description && (
+            <div
+              style={{
+                display: 'flex',
+                marginTop: 16,
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: "'ABCDiatype-Regular'",
+                  fontSize: '18px',
+                  fontWeight: 400,
+                  lineHeight: '24px',
+
+                  margin: 0,
+                }}
+              >
+                {description}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>,
+      {
+        width: WIDTH_OPENGRAPH_IMAGE,
+        height: HEIGHT_OPENGRAPH_IMAGE,
+        emoji: 'twemoji',
+        fonts: [
+          {
+            name: 'ABCDiatype-Regular',
+            data: ABCDiatypeRegularFontData,
+            weight: 400,
+          },
+          {
+            name: 'GT Alpina',
+            data: alpinaLightFontData,
+            style: 'normal',
+            weight: 500,
+          },
+          {
+            name: 'GT Alpina Italic',
+            data: alpinaLightItalicFontData,
+            style: 'normal',
+            weight: 500,
+          },
+        ],
+      }
+    );
+  } catch (error) {
+    console.error('Failed to render NFT OpenGraph image', error);
+    return fallbackImageResponse();
+  }
+};
+
+export default toNextApiHandler(handler);

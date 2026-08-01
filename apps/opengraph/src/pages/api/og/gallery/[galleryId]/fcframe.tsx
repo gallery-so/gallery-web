@@ -1,0 +1,151 @@
+import React from 'react';
+
+/* eslint-disable @next/next/no-img-element */
+import { NextApiRequest } from 'next';
+import { ImageResponse } from '../../../../../utils/imageResponse';
+import { fetchGraphql } from '../../../../../fetch';
+import { fcframeGalleryIdOpengraphQuery } from '../../../../../queries/fcframeGalleryIdOpengraphQuery';
+import {
+  fallbackImageResponse,
+  WIDTH_OPENGRAPH_IMAGE,
+  HEIGHT_OPENGRAPH_IMAGE,
+} from '../../../../../utils/fallback';
+import { ABCDiatypeRegular, ABCDiatypeBold, alpinaLight } from '../../../../../utils/fonts';
+import { framePostHandler } from '../../../../../utils/framePostHandler';
+import { getPreviewTokens } from '../../../../../utils/getPreviewTokens';
+import { getQueryParam } from '../../../../../utils/request';
+import { toNextApiHandler } from '../../../../../utils/nextApiResponse';
+import {
+  generateSplashImageResponse,
+  shouldShowSplashScreen,
+} from '../../../../../utils/splashScreen';
+import {
+  containerStyle,
+  blurredLeftSideImageStyle,
+  blurredRightSideImageStyle,
+  centeredImageContainerStyle,
+  imageDescriptionStyle,
+  textStyle,
+  boldTextStyle,
+  imageStyle,
+  columnFlexStyle,
+  columnAltFlexStyle,
+} from '../../../../../styles';
+
+const handler = async (req: NextApiRequest) => {
+  // handle POST, where we should return `fcframe` og tags to render the next frame with appropriate buttons
+  if (req.method === 'POST') {
+    return framePostHandler({ req, frameType: 'GalleryFrame' });
+  }
+
+  // handle GET, which should return the raw image for the frame
+  try {
+    const galleryId = getQueryParam(req, 'galleryId');
+    const position = getQueryParam(req, 'position');
+
+    if (!galleryId || typeof galleryId !== 'string') {
+      return fallbackImageResponse();
+    }
+
+    const queryResponse = await fetchGraphql({
+      queryText: fcframeGalleryIdOpengraphQuery,
+      variables: { galleryId },
+    });
+
+    const { gallery } = queryResponse.data;
+
+    if (!gallery || gallery?.__typename !== 'Gallery') {
+      return fallbackImageResponse();
+    }
+
+    const ABCDiatypeRegularFontData = await ABCDiatypeRegular(req);
+    const ABCDiatypeBoldFontData = await ABCDiatypeBold(req);
+    const alpinaLightFontData = await alpinaLight(req);
+
+    const tokens = gallery.collections
+      .filter((collection) => !collection?.hidden)
+      .flatMap((collection) => collection?.tokens)
+      .map((el) => el?.token);
+
+    let showSplashScreen = shouldShowSplashScreen({ position, carouselLength: tokens?.length + 1 });
+    if (showSplashScreen) {
+      return generateSplashImageResponse({
+        req,
+        titleText: gallery.name,
+        numSplashImages: 5,
+        tokens,
+        showUsername: true,
+      });
+    }
+
+    const tokensToDisplay = getPreviewTokens(tokens, `${Number(position) - 1}`);
+    const leftToken = tokensToDisplay?.left;
+    const centerToken = tokensToDisplay?.current;
+    const rightToken = tokensToDisplay?.right;
+
+    return ImageResponse.create(
+      <div style={containerStyle}>
+        <div style={blurredLeftSideImageStyle}>
+          {leftToken ? (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <img width="500" height="500" src={leftToken?.src} style={imageStyle} alt="post" />
+              <div style={imageDescriptionStyle}>
+                <p style={textStyle}>{leftToken?.name}</p>
+                <p style={boldTextStyle}>{leftToken?.communityName}</p>
+              </div>
+            </div>
+          ) : null}
+        </div>
+        <div style={centeredImageContainerStyle}>
+          <div style={columnFlexStyle}>
+            <img width="500" height="500" src={centerToken?.src} style={imageStyle} alt="post" />
+            <div style={columnAltFlexStyle}>
+              <p style={textStyle}>{centerToken?.name}</p>
+              <p style={boldTextStyle}>{centerToken?.communityName}</p>
+            </div>
+          </div>
+        </div>
+
+        <div style={blurredRightSideImageStyle}>
+          {rightToken ? (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <img width="500" height="500" src={rightToken?.src} style={imageStyle} alt="post" />
+              <div style={imageDescriptionStyle}>
+                <p style={textStyle}>{rightToken?.name}</p>
+                <p style={boldTextStyle}>{rightToken?.communityName}</p>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>,
+      {
+        width: WIDTH_OPENGRAPH_IMAGE,
+        height: HEIGHT_OPENGRAPH_IMAGE,
+        emoji: 'twemoji',
+        fonts: [
+          {
+            name: 'ABCDiatype-Regular',
+            data: ABCDiatypeRegularFontData,
+            weight: 400,
+          },
+          {
+            name: 'ABCDiatype-Bold',
+            data: ABCDiatypeBoldFontData,
+            weight: 700,
+          },
+          {
+            name: 'GT Alpina',
+            data: alpinaLightFontData,
+            style: 'normal',
+            weight: 500,
+          },
+        ],
+      }
+    );
+  } catch (error) {
+    console.error('Failed to render gallery frame image', error);
+    return fallbackImageResponse();
+  }
+};
+
+export default toNextApiHandler(handler);

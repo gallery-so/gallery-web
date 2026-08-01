@@ -154,16 +154,10 @@ See `apps/mobile/README.md` for full setup instructions including Xcode 16.4 req
 
 GitHub Actions workflows in `.github/workflows/`:
 
-| Workflow       | File                     | Trigger                 | Description                           |
-| -------------- | ------------------------ | ----------------------- | ------------------------------------- |
-| Web E2E        | `web.e2e.yml`            | PR                      | Cypress E2E tests via Docker          |
-| Web Unit       | `web.unit.yml`           | PR                      | Jest unit tests                       |
-| OpenGraph      | `opengraph.yml`          | Push touching OpenGraph | Worker build and renderer smoke tests |
-| Repo Lint      | `repo-lint.yml`          | PR                      | ESLint across all workspaces          |
-| Repo Typecheck | `repo-typecheck.yml`     | PR                      | TypeScript type-checking              |
-| Mobile Build   | `mobile-build.yml`       | Manual/PR               | EAS Build for iOS and Android         |
-| Mobile Release | `mobile-release.yml`     | Manual                  | EAS Submit to app stores              |
-| Bundle Diff    | `web.bundle-diff.yml`    | PR                      | Bundle size comparison                |
-| Screenshots    | `web.screenshots.yml`    | PR                      | Visual regression screenshots         |
-| Link Artifacts | `web.link-artifacts.yml` | PR                      | Link build artifacts to PRs           |
-| Labeler        | `labeler.yml`            | PR                      | Auto-label PRs by file paths          |
+| Workflow       | File                 | Trigger                 | Description                           |
+| -------------- | -------------------- | ----------------------- | ------------------------------------- |
+| Web Unit       | `web.unit.yml`       | Push                    | Web and shared Jest tests             |
+| OpenGraph      | `opengraph.yml`      | Push touching OpenGraph | Worker build and renderer smoke tests |
+| Repo Lint      | `repo-lint.yml`      | Push                    | ESLint and Prettier checks            |
+| Repo Typecheck | `repo-typecheck.yml` | Push                    | TypeScript type-checking              |
+| Labeler        | `labeler.yml`        | Pull request            | Auto-label pull requests              |

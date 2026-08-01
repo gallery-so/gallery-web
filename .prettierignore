@@ -4,6 +4,8 @@ ios
 android
 .expo
 .next
+.open-next
+.wrangler
 public
 persisted_queries.json
 tsconfig.json

@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": [
     "apps/mobile",
+    "apps/opengraph",
     "apps/web",
     "packages/frames-dls",
     "packages/shared"

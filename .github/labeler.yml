@@ -1,6 +1,9 @@
 web:
   - apps/web/**
 
+opengraph:
+  - apps/opengraph/**
+
 mobile:
   - apps/mobile/**
 

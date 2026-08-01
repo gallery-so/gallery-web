@@ -1,0 +1,54 @@
+name: opengraph
+
+on:
+  push:
+    paths:
+      - '.github/workflows/opengraph.yml'
+      - '.moon/**'
+      - 'apps/opengraph/**'
+      - 'apps/web/public/icons/logo-large-2.svg'
+      - 'packages/shared/src/fonts/**'
+      - 'package.json'
+      - 'yarn.lock'
+
+jobs:
+  worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+      - run: 'yarn install --immutable'
+      - name: Build the OpenGraph Worker
+        run: 'yarn workspace opengraph cf:build'
+      - name: Run renderer integration tests
+        run: |
+          yarn workspace opengraph exec wrangler dev --port 3000 > /tmp/opengraph-wrangler.log 2>&1 &
+          worker_pid=$!
+          trap 'kill "$worker_pid" 2>/dev/null || true' EXIT
+
+          for attempt in {1..60}; do
+            if curl --fail --silent --output /dev/null \
+              http://localhost:3000/media/system/opengraph/gallery-full-logo.png; then
+              break
+            fi
+            sleep 1
+          done
+
+          if ! curl --fail --silent --output /dev/null \
+            http://localhost:3000/media/system/opengraph/gallery-full-logo.png; then
+            cat /tmp/opengraph-wrangler.log
+            exit 1
+          fi
+
+          yarn workspace opengraph test --runInBand
+
+          if grep -E 'Already initialized|Exceeded Memory|memory limit' \
+            /tmp/opengraph-wrangler.log; then
+            cat /tmp/opengraph-wrangler.log
+            exit 1
+          fi

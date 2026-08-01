@@ -74,6 +74,18 @@ DEVELOPER_DIR="/path/to/Xcode-16.4.app/Contents/Developer" moon run mobile:ios
 moon run mobile:android
 ```
 
+### Setup OpenGraph
+
+The social-preview renderer is a separate Cloudflare Worker housed at
+`apps/opengraph`:
+
+```bash
+moon run opengraph:dev
+```
+
+See [apps/opengraph/README.md](apps/opengraph/README.md) for its build, integration-test,
+and deployment-source migration instructions.
+
 ### Working with Shared Packages
 
 `/packages/shared` contains shared code that can be utilized by both web and mobile. When developing here, you'll need to run codegen specific to that package, such as `moon run shared:codegen-watch`. In other words, just having the web or mobile app running won't automatically handle codegen for `shared` – that will need to be a separate process.
@@ -106,6 +118,8 @@ Admins (`ADMIN` role) see all features regardless of flag values.
 - `moon run web:relay-watch` to run relay compiler in watch mode
 - `moon run web:lint` for linting
 - `moon run web:typecheck` for checking type validity
+- `moon run opengraph:cf-build` to build the OpenGraph Cloudflare Worker
+- `moon run opengraph:test` to run OpenGraph integration tests against a local Worker
 - `moon run web:synpress-run` to run e2e tests
 - `moon run web:synpress-open` to open cypress
 - `yarn fetch-schema` to pull a graphql schema from a locally configured API

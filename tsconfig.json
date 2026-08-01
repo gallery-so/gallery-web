@@ -6,13 +6,16 @@
       "path": "apps/mobile"
     },
     {
+      "path": "apps/opengraph"
+    },
+    {
       "path": "apps/web"
     },
     {
-      "path": "packages/shared"
+      "path": "packages/frames-dls"
     },
     {
-      "path": "packages/frames-dls"
+      "path": "packages/shared"
     }
   ]
 }

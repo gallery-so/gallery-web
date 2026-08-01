@@ -1,0 +1,57 @@
+language: 'javascript'
+
+fileGroups:
+  tests:
+    - 'tests/**/*'
+    - '**/*.test.ts*'
+  source:
+    - 'src/**/*.{ts,js,tsx,jsx}'
+
+tasks:
+  prepare-assets:
+    command: node scripts/prepare-assets.mjs
+    inputs:
+      - '/packages/shared/src/fonts/ABCDiatype-Bold.ttf'
+      - '/packages/shared/src/fonts/ABCDiatype-Regular.ttf'
+      - '/packages/shared/src/fonts/GT-Alpina-Standard-Light.ttf'
+      - '/packages/shared/src/fonts/GT-Alpina-Standard-Light-Italic.ttf'
+      - '/apps/web/public/icons/logo-large-2.svg'
+    outputs:
+      - 'public/media/system/opengraph/fonts'
+      - 'public/media/system/opengraph/gallery-full-logo.png'
+
+  build:
+    deps:
+      - '~:prepare-assets'
+    command: next build
+    inputs:
+      - '@group(source)'
+      - 'next.config.js'
+
+  cf-build:
+    deps:
+      - '~:prepare-assets'
+    command: opennextjs-cloudflare build
+    inputs:
+      - '@group(source)'
+      - 'next.config.js'
+      - 'open-next.config.ts'
+      - 'wrangler.jsonc'
+
+  dev:
+    deps:
+      - '~:prepare-assets'
+    command: next dev
+    local: true
+
+  preview:
+    deps:
+      - '~:cf-build'
+    command: opennextjs-cloudflare preview
+    local: true
+
+  test:
+    command: jest
+
+  typecheck:
+    command: tsc --noEmit

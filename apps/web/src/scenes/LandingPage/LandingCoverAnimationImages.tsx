@@ -2,7 +2,7 @@ import { AnimatedImage } from '../WelcomeAnimation/Images';
 
 export const animatedImages: AnimatedImage[] = [
   {
-    src: 'https://storage.googleapis.com/gallery-prod-assets/landingPage/04.jpg', // Ringer
+    src: '/gallery-assets/landingPage/04.jpg', // Ringer
     width: 200,
     zIndex: -40,
     offsetX: {
@@ -21,7 +21,7 @@ export const animatedImages: AnimatedImage[] = [
     verticalY: -180,
   },
   {
-    src: 'https://storage.googleapis.com/gallery-prod-assets/landingPage/monarch-min.png', // Monarch
+    src: '/gallery-assets/landingPage/monarch-min.png', // Monarch
     width: 200,
     zIndex: -13,
     offsetX: {
@@ -40,7 +40,7 @@ export const animatedImages: AnimatedImage[] = [
     verticalY: -50,
   },
   {
-    src: 'https://storage.googleapis.com/gallery-prod-assets/landingPage/08.jpg', // squiggle
+    src: '/gallery-assets/landingPage/08.jpg', // squiggle
     width: 260,
     zIndex: -18,
     offsetX: {
@@ -59,7 +59,7 @@ export const animatedImages: AnimatedImage[] = [
     verticalY: 100,
   },
   {
-    src: 'https://storage.googleapis.com/gallery-prod-assets/landingPage/03.jpg', // swirl
+    src: '/gallery-assets/landingPage/03.jpg', // swirl
     width: 200,
     zIndex: 20,
     offsetX: {
@@ -78,7 +78,7 @@ export const animatedImages: AnimatedImage[] = [
     verticalY: 400,
   },
   {
-    src: 'https://storage.googleapis.com/gallery-prod-assets/landingPage/02.jpg', // gallery orb
+    src: '/gallery-assets/landingPage/02.jpg', // gallery orb
     width: 200,
     zIndex: 11,
     offsetX: {
@@ -97,7 +97,7 @@ export const animatedImages: AnimatedImage[] = [
     verticalY: -350,
   },
   {
-    src: 'https://storage.googleapis.com/gallery-prod-assets/landingPage/10.jpg', // allstarz
+    src: '/gallery-assets/landingPage/10.jpg', // allstarz
     width: 180,
     zIndex: 37,
     offsetX: {
@@ -116,7 +116,7 @@ export const animatedImages: AnimatedImage[] = [
     verticalY: 100,
   },
   {
-    src: 'https://storage.googleapis.com/gallery-prod-assets/landingPage/themes-and-variations-364-min.webp', // Themes + Variations
+    src: '/gallery-assets/landingPage/themes-and-variations-364-min.webp', // Themes + Variations
     width: 210,
     zIndex: 25,
     offsetX: {
@@ -135,7 +135,7 @@ export const animatedImages: AnimatedImage[] = [
     verticalY: -600,
   },
   {
-    src: 'https://storage.googleapis.com/gallery-prod-assets/landingPage/07.jpg', // Ghosts
+    src: '/gallery-assets/landingPage/07.jpg', // Ghosts
     width: 200,
     zIndex: 30,
     offsetX: {
@@ -154,7 +154,7 @@ export const animatedImages: AnimatedImage[] = [
     verticalY: 150,
   },
   {
-    src: 'https://storage.googleapis.com/gallery-prod-assets/landingPage/01.jpg', // Rebirth of Venus
+    src: '/gallery-assets/landingPage/01.jpg', // Rebirth of Venus
     width: 170,
     zIndex: -11,
     offsetX: {

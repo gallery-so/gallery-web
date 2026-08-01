@@ -11,9 +11,5 @@ export const pathToImage = featuredImage;
 
 // mint page title, description, eligibility criteria are configured directly in `MementosPage.tsx`
 
-// this probably won't change unless the cache is broken
-// export const ALLOWLIST_URL =
-//   'https://storage.googleapis.com/gallery-prod-assets/allowlists/mementos-allowlist-v4.json';
-
 // no allowlist for public mints
 export const ALLOWLIST_URL = '';

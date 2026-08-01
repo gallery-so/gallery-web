@@ -65,7 +65,7 @@ const App: FC<GalleryAppProps> = (props) => {
 
             <meta
               property="og:image"
-              content="https://storage.googleapis.com/gallery-prod-assets/gallery_full_logo_v2.1.png"
+              content="https://gallery.so/gallery-assets/gallery_full_logo_v2.1.png"
             />
             <meta property="og:image:width" content="1200" />
             <meta property="og:image:height" content="630" />

@@ -53,10 +53,6 @@ const nextConfig = {
     styledComponents: true,
   },
 
-  images: {
-    domains: ['storage.googleapis.com'],
-  },
-
   // Disabled until we figure out what's going on with ERRCONNRESET
   // async rewrites() {
   //   return [

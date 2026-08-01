@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 
 const CACHE_FOLDER = FileSystem.cacheDirectory + 'video/';
 const VIDEO_NAME = 'onboarding_video.mp4';
-const VIDEO_URI =
-  'https://storage.googleapis.com/gallery-prod-assets/mobile_onboarding_animation.mp4';
+const VIDEO_URI = 'https://gallery.so/gallery-assets/mobile_onboarding_animation.mp4';
 
 export const INTRO_VIDEO_STORAGE_KEY = 'introVideoLoaded';
 

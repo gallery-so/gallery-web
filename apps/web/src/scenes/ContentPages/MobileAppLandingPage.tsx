@@ -46,7 +46,7 @@ export default function MobileAppLandingPage() {
             </VStack>
           </VStack>
         </VStack>
-        <StyledImage src="https://storage.googleapis.com/gallery-prod-assets/mobile_app_mock_light.png" />
+        <StyledImage src="/gallery-assets/mobile_app_mock_light.png" />
       </StyledPage>
     </>
   );

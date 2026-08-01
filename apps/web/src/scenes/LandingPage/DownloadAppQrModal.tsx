@@ -3,8 +3,7 @@ import styled from 'styled-components';
 import { VStack } from '~/components/core/Spacer/Stack';
 import { BaseM, TitleL } from '~/components/core/Text/Text';
 
-const QR_CODE_URL =
-  'https://storage.googleapis.com/gallery-prod-assets/landingPage/appstore-qr.jpeg';
+const QR_CODE_URL = '/gallery-assets/landingPage/appstore-qr.jpeg';
 
 export default function DownloadAppQrModal() {
   return (

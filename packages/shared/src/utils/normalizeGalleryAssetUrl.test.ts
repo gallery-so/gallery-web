@@ -24,7 +24,7 @@ describe('normalizeGalleryAssetUrl', () => {
   });
 
   it('leaves unrelated GCS buckets unchanged', () => {
-    const url = 'https://storage.googleapis.com/gallery-prod-assets/logo.png';
+    const url = 'https://storage.googleapis.com/legacy-site-assets/logo.png';
     expect(normalizeGalleryAssetUrl(url)).toBe(url);
   });
 

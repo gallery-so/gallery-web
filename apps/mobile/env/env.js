@@ -13,11 +13,6 @@ const EnvironmentSchema = z.object({
   EXPO_PUBLIC_FORMSPEE_REQUEST_COLLECTION_ID: z.string(),
 });
 
-const SecretsSchema = z.object({
-  PRIVY_APP_ID: z.string(),
-});
-
 module.exports = {
   EnvironmentSchema,
-  SecretsSchema,
 };

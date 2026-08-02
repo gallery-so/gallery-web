@@ -82,7 +82,6 @@ const ManageWalletProvider = memo(({ children }: Props) => {
     }) => {
       if (!userExists) {
         navigation.navigate('OnboardingUsername', {
-          authMethod: 'Wallet',
           authMechanism: {
             authMechanismType: 'eoa',
             chain: 'Ethereum',

@@ -6,14 +6,14 @@ Key external services and libraries that require ongoing subscriptions, API keys
 
 | Service | Web Package | Mobile Package | Requires API Key | Key Location |
 |---------|-------------|----------------|------------------|--------------|
-| **Privy** | `@privy-io/react-auth@^1.60.5` | `@privy-io/expo@^0.11.2` | Yes (App ID) | `NEXT_PUBLIC_PRIVY_APP_ID` (web), `env/.env.secret` (mobile) |
+| **Magic Link** | N/A | `@magic-sdk/react-native-expo@^16.0.0` | Yes (Public Key) | `EXPO_PUBLIC_MAGIC_LINK_PUBLIC_KEY` |
 | **WalletConnect** | `@walletconnect/walletlink-connector@6.1.9` | `@walletconnect/modal-react-native@^1.0.0-rc.10` | Yes (Project ID) | `NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID` |
 | **Farcaster** | `@farcaster/auth-kit@^0.2.1` | `@farcaster/auth-kit@^0.2.1` | No | N/A |
 | **RainbowKit** | `@rainbow-me/rainbowkit@^1.0.5` | N/A | No | Uses WalletConnect Project ID |
 | **Coinbase Wallet** | via RainbowKit | `@coinbase/wallet-mobile-sdk@^1.0.13` | No | N/A |
 
 **Notes:**
-- Privy is the primary auth provider handling email 2FA and wallet authentication
+- Production is read-only and does not expose a supported sign-in flow
 - WalletConnect requires a free project ID from cloud.walletconnect.com
 
 ## Analytics & Monitoring

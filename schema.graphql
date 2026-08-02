@@ -141,7 +141,6 @@ input AuthMechanism {
   debug: DebugAuth
   magicLink: MagicLinkAuth
   oneTimeLoginToken: OneTimeLoginTokenAuth
-  privy: PrivyAuth
   neynar: NeynarAuth
 }
 
@@ -1698,10 +1697,6 @@ type PreviewURLSet {
   srcSet: String
   liveRender: String
   blurhash: String
-}
-
-input PrivyAuth {
-  token: String!
 }
 
 union ProfileImage = TokenProfileImage | EnsProfileImage

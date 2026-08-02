@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import GlobalFooter from '~/contexts/globalLayout/GlobalFooter/GlobalFooter';
-import { useGlobalLayoutActions } from '~/contexts/globalLayout/GlobalLayoutContext';
+import { useGlobalLayoutActions } from '~/contexts/globalLayout/GlobalLayoutContexts';
 
 export type Props = {
   element: JSX.Element;

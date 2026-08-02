@@ -6,7 +6,7 @@ import { CreateUserInput, useCreateUserMutation } from '~/generated/useCreateUse
 import { useCreateUserRefreshViewerQuery } from '~/generated/useCreateUserRefreshViewerQuery.graphql';
 
 import { usePromisifiedMutation } from '../relay/usePromisifiedMutation';
-import { AuthPayloadVariables, isEmailPayload, isEoaPayload } from './useAuthPayloadQuery';
+import { AuthPayloadVariables, isEoaPayload } from './useAuthPayloadQuery';
 
 export default function useCreateUser() {
   const environment = useRelayEnvironment();
@@ -158,13 +158,6 @@ export function getAuthMechanismFromAuthPayload(authPayloadVariables: AuthPayloa
         nonce,
         message,
         signature,
-      },
-    };
-  } else if (isEmailPayload(authPayloadVariables)) {
-    const { privyToken } = authPayloadVariables;
-    authMechanism = {
-      privy: {
-        token: privyToken!,
       },
     };
   } else if (authPayloadVariables.authMechanismType === 'neynar') {

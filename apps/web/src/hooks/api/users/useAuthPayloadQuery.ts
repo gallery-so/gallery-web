@@ -1,14 +1,7 @@
 import { useRouter } from 'next/router';
-import {
-  EoaPayloadVariables,
-  NeynarPayloadVariables,
-  PrivyPayloadVariables,
-} from 'shared/hooks/useAuthPayloadQuery';
+import { EoaPayloadVariables, NeynarPayloadVariables } from 'shared/hooks/useAuthPayloadQuery';
 
-export type AuthPayloadVariables =
-  | EoaPayloadVariables
-  | NeynarPayloadVariables
-  | PrivyPayloadVariables;
+export type AuthPayloadVariables = EoaPayloadVariables | NeynarPayloadVariables;
 
 export function isEoaPayload(payload: AuthPayloadVariables): payload is EoaPayloadVariables {
   return payload.authMechanismType === 'eoa';
@@ -16,19 +9,6 @@ export function isEoaPayload(payload: AuthPayloadVariables): payload is EoaPaylo
 
 export default function useAuthPayloadQuery(): AuthPayloadVariables | null {
   const { query } = useRouter();
-
-  // convert this to privy
-  if (query.authMechanismType === 'privy') {
-    if (typeof query.token !== 'string' || typeof query.email !== 'string') {
-      return null;
-    }
-    return {
-      authMechanismType: 'privy',
-      privyToken: query.token as string,
-      email: query.email as string,
-      userFriendlyWalletName: 'Privy',
-    };
-  }
 
   // need weird typechecking logic in this func due to the fact that nextjs queries can be
   // a variety of types, and doesn't offer generics

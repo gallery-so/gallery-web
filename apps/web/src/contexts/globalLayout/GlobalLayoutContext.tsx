@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { usePrivy } from '@privy-io/react-auth';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  createContext,
   memo,
   ReactElement,
   ReactNode,
   Suspense,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -41,6 +38,11 @@ import {
   UpcomingMaintenanceBanner,
   useUpcomingMaintenanceBannerWeb,
 } from './GlobalBanner/UpcomingMaintenanceBanner';
+import {
+  GlobalLayoutActions,
+  GlobalLayoutActionsContext,
+  GlobalLayoutStateContext,
+} from './GlobalLayoutContexts';
 import GlobalSidebar, { GLOBAL_SIDEBAR_DESKTOP_WIDTH } from './GlobalSidebar/GlobalSidebar';
 import {
   FADE_TRANSITION_TIME_MS,
@@ -48,39 +50,6 @@ import {
   NAVIGATION_TRANSITION_TIME_SECONDS,
 } from './transitionTiming';
 import useStabilizedRouteTransitionKey from './useStabilizedRouteTransitionKey';
-
-type GlobalLayoutState = {
-  isNavbarVisible: boolean;
-  wasNavbarVisible: boolean;
-};
-
-export const GlobalLayoutStateContext = createContext<GlobalLayoutState | undefined>(undefined);
-
-export const useGlobalLayoutState = (): GlobalLayoutState => {
-  const context = useContext(GlobalLayoutStateContext);
-  if (!context) {
-    throw new Error('Attempted to use GlobalLayoutStateContext without a provider!');
-  }
-
-  return context;
-};
-
-type GlobalLayoutActions = {
-  setIsBannerVisible: (b: boolean) => void;
-  setTopNavContent: (e: ReactElement | null) => void;
-  setSidebarContent: (e: ReactElement | null) => void;
-};
-
-const GlobalLayoutActionsContext = createContext<GlobalLayoutActions | undefined>(undefined);
-
-export const useGlobalLayoutActions = (): GlobalLayoutActions => {
-  const context = useContext(GlobalLayoutActionsContext);
-  if (!context) {
-    throw new Error('Attempted to use GlobalLayoutActionsContext without a provider!');
-  }
-
-  return context;
-};
 
 type Props = { children: ReactNode; preloadedQuery: PreloadedQuery<GlobalLayoutContextQuery> };
 
@@ -383,7 +352,6 @@ function GlobalNavbarWithFadeEnabled({
     queryRef
   );
   const galleryLogout = useGalleryLogout({});
-  const { authenticated, ready, logout: privyLogout } = usePrivy();
   const isLoggingOutRef = useRef(false);
 
   const isLoggedInAndDoesNotHaveWallet =
@@ -395,9 +363,8 @@ function GlobalNavbarWithFadeEnabled({
     }
 
     const hasGallerySession = query.viewer?.__typename === 'Viewer';
-    const hasPrivySession = ready && authenticated;
 
-    if (!hasGallerySession && !hasPrivySession) {
+    if (!hasGallerySession) {
       return;
     }
 
@@ -405,18 +372,12 @@ function GlobalNavbarWithFadeEnabled({
 
     void (async () => {
       try {
-        if (hasGallerySession) {
-          await galleryLogout();
-        }
-
-        if (hasPrivySession) {
-          await Promise.resolve(privyLogout());
-        }
+        await galleryLogout();
       } finally {
         isLoggingOutRef.current = false;
       }
     })();
-  }, [authenticated, galleryLogout, privyLogout, query.viewer, ready]);
+  }, [galleryLogout, query.viewer]);
 
   const {
     shouldDisplayBanner: shouldDisplayMaintenanceBanner,

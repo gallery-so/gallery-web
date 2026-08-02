@@ -144,13 +144,6 @@ export function OnboardingAddUsernamePage() {
       if (response.createUser?.__typename === 'CreateUserPayload') {
         const user = response.createUser.viewer?.user;
 
-        // If it's a Privy auth (email 2FA), skip the profile picture step
-        if (authPayloadQuery.authMechanismType === 'privy') {
-          push('/onboarding/add-user-info');
-          setProgress('add-user-info');
-          return;
-        }
-
         if (!isLocked) {
           // Start the sync tokens mutation so the user sees their NFTs loaded ASAP.
           // TODO: in the future, we want to sync across more chains

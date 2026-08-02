@@ -113,8 +113,6 @@ export type MainTabNavigatorParamList = {
   PostTab: NavigatorScreenParams<MainTabStackNavigatorParamList>;
 };
 
-export type AuthMethodTitle = 'Privy' | 'Wallet' | 'Farcaster';
-
 export type LoginStackNavigatorParamList = {
   Landing: undefined;
   QRCode: { onError: (message: string) => void };
@@ -127,7 +125,6 @@ export type LoginStackNavigatorParamList = {
 
   OnboardingUsername: {
     authMechanism: AuthPayloadVariables;
-    authMethod: AuthMethodTitle;
   };
 
   OnboardingProfileBio: undefined;

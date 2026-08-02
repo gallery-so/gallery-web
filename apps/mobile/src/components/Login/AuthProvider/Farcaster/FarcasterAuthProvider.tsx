@@ -113,7 +113,6 @@ export function useLoginWithFarcaster() {
 
           hideBottomSheetModal();
           navigation.navigate('OnboardingUsername', {
-            authMethod: 'Farcaster',
             authMechanism: createUserAuthMechanism,
           });
           return;

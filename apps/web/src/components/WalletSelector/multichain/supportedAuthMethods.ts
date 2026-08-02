@@ -3,8 +3,7 @@ export type SupportedAuthMethodKey =
   | 'gnosisSafe'
   | 'tezos'
   | 'solana'
-  | 'delegateCash'
-  | 'privy';
+  | 'delegateCash';
 
 export type SupportedAuthMethod = {
   name: string;
@@ -28,8 +27,5 @@ export const supportedAuthMethods: Readonly<
   },
   delegateCash: {
     name: 'Delegate Cash',
-  },
-  privy: {
-    name: 'Email',
   },
 };

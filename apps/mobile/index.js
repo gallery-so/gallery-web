@@ -1,4 +1,4 @@
-// polyfills for privy
+// Polyfills for React Native wallet integrations
 import 'fast-text-encoding';
 import 'react-native-get-random-values';
 import '@ethersproject/shims';

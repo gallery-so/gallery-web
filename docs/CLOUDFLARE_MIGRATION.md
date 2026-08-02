@@ -25,8 +25,8 @@ existing API, CDN, analytics, email, and other non-frontend DNS services.
   image assets keep their immutable cache policy.
 - The app uses deployment-neutral environment variables and no longer contains Vercel runtime
   fallbacks.
-- The production API, analytics proxy, Sanity project, Privy application, and public analytics
-  configuration were verified against the currently deployed web bundle.
+- The production API, analytics proxy, Sanity project, and public analytics configuration were
+  verified against the currently deployed web bundle.
 - The GitHub repository is connected to the Cloudflare Worker. Pushes to `main` build and deploy
   with `yarn workspace web cf:build` and `yarn workspace web cf:deploy`; non-production branch
   deployments are disabled.

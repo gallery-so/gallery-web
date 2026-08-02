@@ -83,12 +83,11 @@ npx relay-compiler --project web relay.config.js
 
 ## Authentication
 
-The app supports multiple auth methods via [Privy](https://www.privy.io/):
+Production is permanently read-only and no longer initializes an email authentication provider. The source still contains legacy wallet connectors used by historical onboarding and wallet-management flows:
 
 | Method          | Web Package              | Mobile Package                      |
 | --------------- | ------------------------ | ----------------------------------- |
-| Email (2FA)     | `@privy-io/react-auth`   | `@privy-io/expo`                    |
-| Magic Link      | `magic-sdk`              | `@magic-sdk/react-native-expo`      |
+| Magic Link      | N/A                      | `@magic-sdk/react-native-expo`      |
 | WalletConnect   | `@walletconnect/*`       | `@walletconnect/modal-react-native` |
 | Farcaster       | `@farcaster/auth-kit`    | `@farcaster/auth-kit`               |
 | Coinbase Wallet | via RainbowKit           | `@coinbase/wallet-mobile-sdk`       |
@@ -136,7 +135,7 @@ Copy the sample env file:
 cp apps/web/.env.sample apps/web/.env
 ```
 
-Key variables include API endpoints, auth provider keys (Privy, WalletConnect, Magic Link), Ethereum RPC (Infura), contract addresses, analytics (Mixpanel), error tracking (Sentry), and CMS (Sanity).
+Key variables include API endpoints, the WalletConnect project ID, Ethereum RPC (Infura), contract addresses, analytics (Mixpanel), error tracking (Sentry), and CMS (Sanity).
 
 See `apps/web/.env.sample` for the complete list with descriptions.
 
@@ -146,7 +145,6 @@ Environment files are in `apps/mobile/env/`:
 
 - `.env.dev` - Development API endpoints
 - `.env.prod` - Production endpoints
-- `.env.secret` - Local-only secrets (Privy app ID, Sentry auth token)
 
 See `apps/mobile/README.md` for full setup instructions including Xcode 16.4 requirements.
 

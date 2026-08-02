@@ -70,7 +70,6 @@ function InnerOnboardingUsernameScreen() {
   const { isSyncing, syncTokens } = useSyncTokensActions();
 
   const route = useRoute<RouteProp<LoginStackNavigatorParamList, 'OnboardingUsername'>>();
-  const authMethod = route.params.authMethod;
   const authMechanism = route.params.authMechanism;
 
   const [username, setUsername] = useState(user?.username ?? '');
@@ -119,12 +118,6 @@ function InnerOnboardingUsernameScreen() {
           throw new Error('No authmechanism found for user creation on mobile');
         }
 
-        // If the user is signing up with email, redirect to the bio screen
-        if (authMethod === 'Privy') {
-          navigation.navigate('OnboardingProfileBio');
-          return;
-        }
-
         // fire this off async
         if (!isSyncing) {
           // TODO: we want to trigger multisync but it's just a bit too slow rn
@@ -167,7 +160,6 @@ function InnerOnboardingUsernameScreen() {
     createUser,
     updateUser,
     navigation,
-    authMethod,
     isSyncing,
     syncTokens,
     setEnsProfileImage,

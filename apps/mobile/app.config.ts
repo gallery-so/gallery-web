@@ -3,7 +3,7 @@ import { ConfigContext, ExpoConfig } from 'expo/config';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { EnvironmentSchema, SecretsSchema } from './env/env';
+import { EnvironmentSchema } from './env/env';
 
 // TODO: fix zod return type later
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,19 +24,7 @@ const environmentVariablePath = path.join(
   `./env/.env.${process.env.EXPO_PUBLIC_ENV ?? 'prod'}`
 );
 
-let environmentVariables = readEnvironmentFromFile(environmentVariablePath, EnvironmentSchema);
-
-const isCloudExpoBuildContext = process.env.USER === 'expo';
-const isGithubBuildContext = 'GITHUB_JOB' in process.env;
-const isLocalContext = !isCloudExpoBuildContext && !isGithubBuildContext;
-
-if (isLocalContext) {
-  const secretsPath = path.join(__dirname, `./env/.env.secret`);
-  environmentVariables = {
-    ...environmentVariables,
-    ...readEnvironmentFromFile(secretsPath, SecretsSchema),
-  };
-}
+const environmentVariables = readEnvironmentFromFile(environmentVariablePath, EnvironmentSchema);
 
 const commitHash = process.env.EAS_BUILD_GIT_COMMIT_HASH;
 

@@ -43,7 +43,7 @@ High-level architecture overview for new team onboarding.
 1. **Monorepo Structure** - Workspace layout (`apps/web`, `apps/mobile`, `packages/shared`, `packages/frames-dls`), Moon build tool, Yarn 3.4.1 workspaces
 2. **Build System** - Moon commands, how to run web/mobile, shared package build order (`npx tsc --project packages/shared/tsconfig.json` must run first)
 3. **GraphQL & Relay** - Schema location (`schema.graphql`), Relay compiler config (`relay.config.js`), auto-persisted queries (web only), `__generated__` directories
-4. **Authentication** - Privy (email 2FA), Magic Link, WalletConnect, Farcaster, wallet EOA flows
+4. **Authentication** - Magic Link, WalletConnect, Farcaster, and wallet EOA flows
 5. **Feature Flags** - Static flags in `packages/shared/src/utils/featureFlags.ts` for pre-auth, Relay-based flags in app-specific `isFeatureEnabled.tsx` for authenticated contexts
 6. **Environment Setup** - Reference to `.env.sample` (web) and `env/` directory (mobile), how to fetch schema
 7. **CI/CD** - GitHub Actions workflows overview, what each workflow does
@@ -92,8 +92,7 @@ Document key third-party services that require ongoing subscriptions, API keys, 
 **Sections:**
 
 1. **Authentication Services**
-   - Privy (`@privy-io/react-auth`, `@privy-io/expo`) - Email 2FA, wallet auth
-   - Magic Link (`magic-sdk`, `@magic-sdk/react-native-expo`) - Auth provider
+   - Magic Link (`@magic-sdk/react-native-expo`) - Legacy mobile auth provider
    - WalletConnect - Multi-chain wallet connections
    - Farcaster (`@farcaster/auth-kit`) - Social login
 

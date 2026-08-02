@@ -46,7 +46,6 @@ module.exports = async () => {
     '@rainbow-me/rainbowkit',
     'ofetch',
     'jose',
-    '@privy-io/react-auth',
     '@coinbase/wallet-sdk',
     'preact',
     'uint8arrays',

@@ -119,22 +119,6 @@ export default function useLoginOrRedirectToOnboarding() {
           setProgress('add-username');
         }
 
-        // TODO: this should be privy
-        if (authMechanism.mechanism.privy) {
-          push(
-            {
-              pathname: '/onboarding/add-username',
-              query: {
-                authMechanismType: 'privy',
-                token: authMechanism.mechanism.privy.token,
-                userFriendlyWalletName,
-              },
-            },
-            '/onboarding/add-username'
-          );
-          setProgress('add-username');
-        }
-
         return;
       }
     },

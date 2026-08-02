@@ -31,13 +31,6 @@ Env files live in `apps/mobile/env/`:
 
 - `.env.dev` — dev API endpoints, tokens
 - `.env.prod` — production endpoints
-- `.env.secret` — local-only secrets (`PRIVY_APP_ID`, `SENTRY_AUTH_TOKEN`)
-
-Copy the secret template and fill in values:
-
-```bash
-cp apps/mobile/env/.env.secret.example apps/mobile/env/.env.secret
-```
 
 ## Running the app
 

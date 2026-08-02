@@ -4,7 +4,7 @@ Last updated: 2026-02-06.
 
 ## Critical
 
-- **Environment setup required** - Several auth and RPC integrations depend on local environment configuration. Expect to provide your own provider credentials before running production-like builds.
+- **Environment setup required** - Several wallet and RPC integrations depend on local environment configuration. Expect to provide your own provider credentials before running production-like builds.
 
 ## Major Areas
 

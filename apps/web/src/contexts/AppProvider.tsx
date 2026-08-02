@@ -1,4 +1,3 @@
-import { PrivyClientConfig, PrivyProvider } from '@privy-io/react-auth';
 import { lazy } from 'react';
 import { Environment, PreloadedQuery, RelayEnvironmentProvider } from 'react-relay';
 
@@ -38,15 +37,57 @@ type Props = {
 
 const isProd = isProduction();
 
-const privyConfig: PrivyClientConfig = {
-  loginMethods: ['email'],
-  embeddedWallets: {
-    // automatically generate embedded wallets for new users signing up with privy emails.
-    // this will not apply to users signing up with farcaster or wallet extensions, since
-    // those methods already come with a wallet.
-    createOnLogin: 'users-without-wallets',
-  },
-};
+function AppUiProviders({
+  children,
+  globalLayoutContextPreloadedQuery,
+}: Pick<Props, 'children' | 'globalLayoutContextPreloadedQuery'>) {
+  return (
+    <PostComposerProvider>
+      <ModalProvider>
+        <SidebarDrawerProvider>
+          <SearchProvider>
+            <SnowProvider enabled={false}>
+              <GlobalLayoutContextProvider preloadedQuery={globalLayoutContextPreloadedQuery}>
+                <BottomSheetProvider>
+                  <FullPageNftDetailModalListener />
+                  {isProd ? null : <Debugger />}
+                  {children}
+                </BottomSheetProvider>
+              </GlobalLayoutContextProvider>
+            </SnowProvider>
+          </SearchProvider>
+        </SidebarDrawerProvider>
+      </ModalProvider>
+    </PostComposerProvider>
+  );
+}
+
+function AppFeatureProviders({
+  children,
+  globalLayoutContextPreloadedQuery,
+}: Pick<Props, 'children' | 'globalLayoutContextPreloadedQuery'>) {
+  return (
+    <AnalyticsProvider>
+      <WebErrorReportingProvider>
+        <SwrProvider>
+          <GalleryNavigationProvider>
+            <NftPreviewFallbackProvider>
+              <NftErrorProvider>
+                <SyncTokensLockProvider>
+                  <AppUiProviders
+                    globalLayoutContextPreloadedQuery={globalLayoutContextPreloadedQuery}
+                  >
+                    {children}
+                  </AppUiProviders>
+                </SyncTokensLockProvider>
+              </NftErrorProvider>
+            </NftPreviewFallbackProvider>
+          </GalleryNavigationProvider>
+        </SwrProvider>
+      </WebErrorReportingProvider>
+    </AnalyticsProvider>
+  );
+}
 
 export default function AppProvider({
   children,
@@ -63,44 +104,11 @@ export default function AppProvider({
           >
             <Boundary>
               <RelayEnvironmentProvider environment={relayEnvironment}>
-                <PrivyProvider
-                  appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? ''}
-                  config={privyConfig}
+                <AppFeatureProviders
+                  globalLayoutContextPreloadedQuery={globalLayoutContextPreloadedQuery}
                 >
-                  <AnalyticsProvider>
-                    <WebErrorReportingProvider>
-                      <SwrProvider>
-                        <GalleryNavigationProvider>
-                          <NftPreviewFallbackProvider>
-                            <NftErrorProvider>
-                              <SyncTokensLockProvider>
-                                <PostComposerProvider>
-                                  <ModalProvider>
-                                    <SidebarDrawerProvider>
-                                      <SearchProvider>
-                                        <SnowProvider enabled={false}>
-                                          <GlobalLayoutContextProvider
-                                            preloadedQuery={globalLayoutContextPreloadedQuery}
-                                          >
-                                            <BottomSheetProvider>
-                                              <FullPageNftDetailModalListener />
-                                              {isProd ? null : <Debugger />}
-                                              {children}
-                                            </BottomSheetProvider>
-                                          </GlobalLayoutContextProvider>
-                                        </SnowProvider>
-                                      </SearchProvider>
-                                    </SidebarDrawerProvider>
-                                  </ModalProvider>
-                                </PostComposerProvider>
-                              </SyncTokensLockProvider>
-                            </NftErrorProvider>
-                          </NftPreviewFallbackProvider>
-                        </GalleryNavigationProvider>
-                      </SwrProvider>
-                    </WebErrorReportingProvider>
-                  </AnalyticsProvider>
-                </PrivyProvider>
+                  {children}
+                </AppFeatureProviders>
               </RelayEnvironmentProvider>
             </Boundary>
           </MaintenanceStatusProvider>

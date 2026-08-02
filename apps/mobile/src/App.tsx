@@ -1,7 +1,6 @@
 import 'expo-dev-client';
 
 import { PortalHost, PortalProvider } from '@gorhom/portal';
-import { PrivyProvider } from '@privy-io/expo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -40,6 +39,58 @@ import { useCacheIntroVideo } from './screens/Onboarding/useCacheIntroVideo';
 
 SplashScreen.preventAutoHideAsync();
 
+function MobileFeatureProviders({
+  navigationRef,
+}: {
+  navigationRef: ReturnType<typeof useNavigationContainerRef>;
+}) {
+  return (
+    <BottomSheetModalProvider>
+      <SyncTokensProvider>
+        <ManageWalletProvider>
+          <SanityAnnouncementProvider>
+            {/* Register the user's push token if one exists (does not prompt the user) */}
+            <NotificationRegistrar />
+            <DevMenuItems />
+            <DeepLinkRegistrar />
+            <RootStackNavigator navigationContainerRef={navigationRef} />
+          </SanityAnnouncementProvider>
+        </ManageWalletProvider>
+      </SyncTokensProvider>
+      <PortalHost name="app-context" />
+    </BottomSheetModalProvider>
+  );
+}
+
+function MobileRuntimeProviders() {
+  const navigationRef = useNavigationContainerRef();
+
+  return (
+    <MobileAnalyticsProvider>
+      <MobileErrorReportingProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <SafeAreaProvider>
+            <magic.Relayer />
+            <SearchProvider>
+              <NavigationContainer ref={navigationRef}>
+                <SanityDataProvider>
+                  <ToastProvider>
+                    <TokenStateManagerProvider>
+                      <PortalProvider>
+                        <MobileFeatureProviders navigationRef={navigationRef} />
+                      </PortalProvider>
+                    </TokenStateManagerProvider>
+                  </ToastProvider>
+                </SanityDataProvider>
+              </NavigationContainer>
+            </SearchProvider>
+          </SafeAreaProvider>
+        </GestureHandlerRootView>
+      </MobileErrorReportingProvider>
+    </MobileAnalyticsProvider>
+  );
+}
+
 export default function App() {
   const [relayEnvironment] = useState(() => createRelayEnvironment());
 
@@ -61,8 +112,6 @@ export default function App() {
     ABCDiatypeMedium: require('~/shared/fonts/ABCDiatype-Medium.ttf'),
     ABCDiatypeBold: require('~/shared/fonts/ABCDiatype-Bold.ttf'),
   });
-
-  const navigationRef = useNavigationContainerRef();
 
   const [colorSchemeLoaded, setColorSchemeLoaded] = useState(false);
   const { setColorScheme, colorScheme } = useColorScheme();
@@ -131,45 +180,7 @@ export default function App() {
           <RelayEnvironmentProvider environment={relayEnvironment}>
             <SWRConfig>
               <Suspense fallback={<LoadingView />}>
-                <PrivyProvider appId={env.PRIVY_APP_ID}>
-                  <MobileAnalyticsProvider>
-                    <MobileErrorReportingProvider>
-                      <GestureHandlerRootView style={{ flex: 1 }}>
-                        <SafeAreaProvider>
-                          <magic.Relayer />
-                          <SearchProvider>
-                            <NavigationContainer ref={navigationRef}>
-                              <SanityDataProvider>
-                                <ToastProvider>
-                                  <TokenStateManagerProvider>
-                                    <PortalProvider>
-                                      <BottomSheetModalProvider>
-                                        <SyncTokensProvider>
-                                          <ManageWalletProvider>
-                                            <SanityAnnouncementProvider>
-                                              {/* Register the user's push token if one exists (does not prompt the user) */}
-                                              <NotificationRegistrar />
-                                              <DevMenuItems />
-                                              <DeepLinkRegistrar />
-                                              <RootStackNavigator
-                                                navigationContainerRef={navigationRef}
-                                              />
-                                            </SanityAnnouncementProvider>
-                                          </ManageWalletProvider>
-                                        </SyncTokensProvider>
-                                        <PortalHost name="app-context" />
-                                      </BottomSheetModalProvider>
-                                    </PortalProvider>
-                                  </TokenStateManagerProvider>
-                                </ToastProvider>
-                              </SanityDataProvider>
-                            </NavigationContainer>
-                          </SearchProvider>
-                        </SafeAreaProvider>
-                      </GestureHandlerRootView>
-                    </MobileErrorReportingProvider>
-                  </MobileAnalyticsProvider>
-                </PrivyProvider>
+                <MobileRuntimeProviders />
               </Suspense>
             </SWRConfig>
           </RelayEnvironmentProvider>
